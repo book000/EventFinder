@@ -1,0 +1,36 @@
+color:
+- org.bukkit.event.block: RED
+  org.bukkit.event.enchantment: LIGHT_PURPLE
+  org.bukkit.event.entity: GREEN
+  org.bukkit.event.hanging: DARK_PURPLE
+  org.bukkit.event.inventory: YELLOW
+  org.bukkit.event.painting: GOLD
+  org.bukkit.event.player: AQUA
+  org.bukkit.event.server: DARK_RED
+  org.bukkit.event.vehicle: GRAY
+  org.bukkit.event.weather: BLUE
+  org.bukkit.event.world: DARK_GREEN
+hidePattern:
+- vehicleupdateevent
+- playermoveevent
+- blockphysicsevent
+- playeranimationevent
+- chunkloadevent
+- entitymoveevent
+- entityairchangeevent
+- entityaddtoworldevent
+- stridertemperaturechangeevent
+- servertickstartevent
+- servertickendevent
+- entitypathfindevent
+- entityjumpevent
+- chunkpopulateeventchunkpopulateevent
+- chunkpopulateevent
+- blockfromtoevent
+- fluidlevelchangeevent
+- playerchunkloadevent
+- playerstatisticincrementevent
+- playernaturallyspawncreaturesevent
+- playerchunkunloadevent
+- entityexhaustionevent
+- chunkunloadevent
