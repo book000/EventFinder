@@ -13,6 +13,7 @@
 
 - `/event <add|hide> <EventNamePattern>`: `EventNamePattern` を非表示条件に追加します。
 - `/event <del|remove|show> <EventNamePattern>`: `EventNamePattern` を非表示条件から削除します。
+- `/event filter <FilterString>`: `FilterString` を含むイベント情報のみを表示します。
 - `/event list`: 非表示条件の一覧を表示します。
 - `/event save`: 非表示条件をファイルへセーブします。
 - `/event load`: 非表示条件をファイルからロードします。

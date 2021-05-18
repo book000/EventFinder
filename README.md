@@ -13,6 +13,7 @@ Download the jar file from [Releases](https://github.com/book000/EventFinder/rel
 
 - `/event <add|hide> <EventNamePattern>`: Add `EventNamePattern` to the hide condition.
 - `/event <del|remove|show> <EventNamePattern>`: Removes `EventNamePattern` from the hiding condition.
+- `/event filter <FilterString>`: Display only event information that includes `FilterString`.
 - `/event list`: Displays a list of hidden conditions.
 - `/event save`: Saves the hidden conditions to a file.
 - `/event load`: Load the hidden conditions from a file.
