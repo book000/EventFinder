@@ -2,10 +2,8 @@ name: EventFinder
 version: ${project.version}
 main: com.tomacheese.eventfinder.Main
 api-version: 1.16
+author: mine_book000
 commands:
   event:
-    description: イベントの表示・非表示の条件を変更します
-    usage: /event load | /event save | /event show | /event add PATTERN... | /event remove PATTERN...
-    permission: Protecter.basic
-    permission-message: You don't have <permission>
+    description: Change the conditions for showing / hiding events
     default: op
