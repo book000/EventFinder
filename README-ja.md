@@ -7,7 +7,7 @@
 
 ## Installation
 
-[Releases](https://github.com/book000/FirstPlayerNotify/releases) から jar ファイルをダウンロードし、 `plugins` ディレクトリに入れてください。
+[Releases](https://github.com/book000/EventFinder/releases) から jar ファイルをダウンロードし、 `plugins` ディレクトリに入れてください。
 
 ## Commands
 
