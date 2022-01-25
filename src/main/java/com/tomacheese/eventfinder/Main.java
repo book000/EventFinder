@@ -11,6 +11,7 @@ import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -481,6 +482,7 @@ public final class Main extends JavaPlugin {
                         "getUniqueId: " + player.getUniqueId()
                 )));
         }
+
         if (obj instanceof Location) {
             Location loc = (Location) obj;
             return Component.text(String.format("%s %d,%d,%d", loc.getWorld().getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()))
@@ -493,6 +495,7 @@ public final class Main extends JavaPlugin {
                         "getZ: " + loc.getZ()
                 )));
         }
+
         if (obj instanceof LivingEntity) {
             LivingEntity livingEntity = (LivingEntity) obj;
             return Component.text(obj.getClass().getSimpleName())
@@ -512,6 +515,7 @@ public final class Main extends JavaPlugin {
                         "getLocation.getZ: " + livingEntity.getLocation().getZ()
                 )));
         }
+
         if (obj instanceof Entity) {
             Entity entity = (Entity) obj;
             return Component.text(obj.getClass().getSimpleName())
@@ -531,6 +535,7 @@ public final class Main extends JavaPlugin {
                         "getLocation.getZ: " + entity.getLocation().getZ()
                 )));
         }
+
         if (obj instanceof Block) {
             Block block = (Block) obj;
             return Component.text(obj.getClass().getSimpleName())
@@ -548,7 +553,28 @@ public final class Main extends JavaPlugin {
                         "getLocation.getY: " + block.getLocation().getY() + "\n" +
                         "getLocation.getZ: " + block.getLocation().getZ()
                 )));
-        } else if (obj instanceof List) {
+        }
+
+        if (obj instanceof BlockState) {
+            BlockState blockState = (BlockState) obj;
+            return Component.text(obj.getClass().getSimpleName())
+                .append(Component.text("{"))
+                .append(Component.text(blockState.getType().name()))
+                .append(Component.text(", "))
+                .append(converter(blockState.getLocation()))
+                .append(Component.text("}"))
+                .hoverEvent(HoverEvent.showText(Component.text(
+                    obj.getClass().getName() + "\n" +
+                        "\n" +
+                        "getType.name:" + blockState.getType().name() + "\n" +
+                        "getLocation.getWorld.getName: " + blockState.getLocation().getWorld().getName() + "\n" +
+                        "getLocation.getX: " + blockState.getLocation().getX() + "\n" +
+                        "getLocation.getY: " + blockState.getLocation().getY() + "\n" +
+                        "getLocation.getZ: " + blockState.getLocation().getZ()
+                )));
+        }
+
+        if (obj instanceof List) {
             List<?> list = (List<?>) obj;
             TextComponent.Builder component = Component.text()
                 .append(Component.text("["));
@@ -557,7 +583,9 @@ public final class Main extends JavaPlugin {
             return component.append(Component.text("]"))
                 .hoverEvent(HoverEvent.showText(Component.text(obj.getClass().getName() + "\n\nsize: " + list.size())))
                 .build();
-        } else if (obj instanceof Set) {
+        }
+
+        if (obj instanceof Set) {
             Set<?> set = (Set<?>) obj;
             TextComponent.Builder component = Component.text()
                 .append(Component.text("["));
@@ -566,13 +594,16 @@ public final class Main extends JavaPlugin {
             return component.append(Component.text("]"))
                 .hoverEvent(HoverEvent.showText(Component.text(obj.getClass().getName() + "\n\nsize: " + set.size())))
                 .build();
-        } else if (obj instanceof Class) {
+        }
+
+        if (obj instanceof Class) {
             Class<?> clazz = (Class<?>) obj;
             return Component.text(clazz.getSimpleName())
                 .hoverEvent(HoverEvent.showText(Component.text(obj.getClass().getName())));
         }
 
         if (obj == null) return Component.text("NULL", NamedTextColor.DARK_PURPLE);
+
         return Component.text(obj.toString())
             .hoverEvent(HoverEvent.showText(Component.text(obj.getClass().getName())));
     }

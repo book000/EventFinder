@@ -1,6 +1,6 @@
 @echo off
 set PLUGIN_NAME=EventFinder
-set JAR_FILE=eventfinder-1.0.jar
+set JAR_FILE=eventfinder-*.jar
 
 if not exist run (
     mkdir run
