@@ -86,6 +86,7 @@ jobs:
     needs: [ setup, get-versions, create-release ]
 
     strategy:
+      fail-fast: false
       matrix:
         versions: ${{ fromJson(needs.get-versions.outputs.versions) }}
 
