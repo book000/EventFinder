@@ -46,6 +46,9 @@ jobs:
       versions: ${{ steps.versions.outputs.value }}
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
       - name: Get versions
         id: versions
         run: |
@@ -63,6 +66,9 @@ jobs:
       release-html-url: ${{ steps.create_release.outputs.html_url }}
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
       - name: Bump version and push tag
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.0
@@ -89,6 +95,9 @@ jobs:
       matrix: ${{ fromJson(needs.get-versions.outputs.versions) }}
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
       - name: Create event files
         run: python tools/getEvents.py ${{ matrix.javadoc_version }}
 
