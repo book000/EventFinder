@@ -45,13 +45,6 @@ def get_paper_io_maven():
 
 # https://paper.readthedocs.io/en/latest/server/getting-started.html#requirements
 java_versions = {
-    "1.9": "1.8",
-    "1.10": "1.8",
-    "1.11": "1.8",
-    "1.12": "11",
-    "1.13": "11",
-    "1.14": "11",
-    "1.15": "11",
     "1.16": "16",
     "1.17": "16",
     "1.18": "17",
@@ -59,6 +52,8 @@ java_versions = {
 
 versions = []
 for (javadoc_version, ver) in get_destroystokyo_com_maven().items():
+    if javadoc_version not in java_versions:
+        continue
     versions.append(json.dumps({
         "groupId": "com.destroystokyo.paper",
         "javadoc_version": javadoc_version,
@@ -67,6 +62,8 @@ for (javadoc_version, ver) in get_destroystokyo_com_maven().items():
     }))
 
 for (javadoc_version, ver) in get_paper_io_maven().items():
+    if javadoc_version not in java_versions:
+        continue
     versions.append(json.dumps({
         "groupId": "io.papermc.paper",
         "javadoc_version": javadoc_version,
