@@ -59,19 +59,19 @@ java_versions = {
 
 versions = []
 for (javadoc_version, ver) in get_destroystokyo_com_maven().items():
-    versions.append({
+    versions.append(json.dumps({
         "groupId": "com.destroystokyo.paper",
         "javadoc_version": javadoc_version,
         "version": ver,
         "java_version": java_versions[javadoc_version]
-    })
+    }))
 
 for (javadoc_version, ver) in get_paper_io_maven().items():
-    versions.append({
+    versions.append(json.dumps({
         "groupId": "io.papermc.paper",
         "javadoc_version": javadoc_version,
         "version": ver,
         "java_version": java_versions[javadoc_version]
-    })
+    }))
 
 print(json.dumps(versions))
