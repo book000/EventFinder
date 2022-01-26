@@ -12,6 +12,9 @@
     <name>EventFinder</name>
 
     <properties>
+        <papermc.groupId>com.destroystokyo.paper</papermc.groupId>
+        <papermc.artifactId>paper-api</papermc.artifactId>
+        <papermc.version>1.16.5-R0.1-SNAPSHOT</papermc.version>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -38,6 +41,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <finalName>${project.name}-${project.version}-${papermc.version}</finalName>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>
                     </execution>
@@ -65,10 +69,21 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.16.5-R0.1-SNAPSHOT</version>
+            <groupId>${papermc.groupId}</groupId>
+            <artifactId>${papermc.artifactId}</artifactId>
+            <version>${papermc.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.10.2</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
