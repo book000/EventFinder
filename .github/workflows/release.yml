@@ -30,11 +30,6 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install dependencies
-        run: |
-          pip install requests
-          pip install beautifulsoup4
-
       - name: Cache local Maven repository
         uses: actions/cache@v2
         with:
@@ -111,6 +106,11 @@ jobs:
           echo "::set-output name=javadoc_version::${{ fromJson(matrix.versions).javadoc_version }}"
           echo "::set-output name=version::${{ fromJson(matrix.versions).version }}"
           echo "::set-output name=java_version::${{ fromJson(matrix.versions).java_version }}"
+
+      - name: Install dependencies
+        run: |
+          pip install requests
+          pip install beautifulsoup4
 
       - name: Create event files
         run: python tools/getEvents.py ${{ steps.manage-matrix.outputs.javadoc_version }}
