@@ -1,7 +1,6 @@
 name: EventFinder
 version: ${project.version}
 main: com.tomacheese.eventfinder.Main
-api-version: 1.16
 author: mine_book000
 commands:
   event:
