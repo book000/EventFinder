@@ -30,6 +30,11 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Install dependencies
+        run: |
+          pip install requests
+          pip install beautifulsoup4
+
       - name: Cache local Maven repository
         uses: actions/cache@v2
         with:
