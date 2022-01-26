@@ -45,10 +45,6 @@ def get_paper_io_maven():
 
 # https://paper.readthedocs.io/en/latest/server/getting-started.html#requirements
 java_versions = {
-    "1.12": "11",
-    "1.13": "11",
-    "1.14": "11",
-    "1.15": "11",
     "1.16": "16",
     "1.17": "16",
     "1.18": "17",
