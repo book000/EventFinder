@@ -2,7 +2,7 @@
 
 [Click here for English README](README.md)
 
-発生したイベントをチャット欄に表示する PaperMC 1.16.5 のプラグインです。  
+発生したイベントをチャット欄に表示する PaperMC 1.16.5 以降のプラグインです。  
 石橋を叩いて壊すブログ様の [発生したイベントを画面に表示するプラグインを作った](https://www.jias.jp/blog/?84) のコードを修正・改良しています。
 
 ## Installation
