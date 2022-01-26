@@ -92,7 +92,8 @@ jobs:
     needs: [ setup, get-versions, create-release ]
 
     strategy:
-      matrix: ${{ fromJson(needs.get-versions.outputs.versions) }}
+      matrix:
+        versions: ${{ fromJson(needs.get-versions.outputs.versions) }}
 
     steps:
       - name: Checkout
