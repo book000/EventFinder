@@ -2,7 +2,7 @@
 
 [日本語の README はこちらから](README-ja.md)
 
-This is a plugin for PaperMC 1.16.5 that displays events that have occurred in the chat.  
+This is a plugin for PaperMC 1.16.5 or later that displays events that have occurred in the chat.  
 The code is modified and improved from the code in [発生したイベントを画面に表示するプラグインを作った](https://www.jias.jp/blog/?84) of the "石橋を叩いて壊すブログ".
 
 ## Installation
