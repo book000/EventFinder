@@ -89,14 +89,22 @@ jobs:
       matrix: ${{ fromJson(needs.get-versions.outputs.versions) }}
 
     steps:
+      - name: Manage matrix
+        id: manage-matrix
+        run: |
+          echo "::set-output name=groupId::${{ fromJson(matrix.versions).groupId }}"
+          echo "::set-output name=javadoc_version::${{ fromJson(matrix.versions).javadoc_version }}"
+          echo "::set-output name=version::${{ fromJson(matrix.versions).version }}"
+          echo "::set-output name=java_version::${{ fromJson(matrix.versions).java_version }}"
+
       - name: Create event files
-        run: python tools/getEvents.py ${{ matrix.javadoc_version }}
+        run: python tools/getEvents.py ${{ steps.manage-matrix.outputs.javadoc_version }}
 
       - name: Build with Maven
-        run: mvn package -Djava.version=${{ matrix.java_version }} -Dpapermc.groupId=${{ matrix.groupId }} -Dpapermc.version=${{ matrix.version }}
+        run: mvn package -Djava.version=${{ steps.manage-matrix.outputs.java_version }} -Dpapermc.groupId=${{ steps.manage-matrix.outputs.groupId }} -Dpapermc.version=${{ steps.manage-matrix.outputs.version }}
 
       - name: Upload Release Asset
         uses: shogo82148/actions-upload-release-asset@v1.5.0
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: target/*-${{ matrix.version }}.jar
+          asset_path: target/*-${{ steps.manage-matrix.outputs.version }}.jar
