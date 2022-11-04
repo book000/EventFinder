@@ -44,7 +44,7 @@ jobs:
         run: |
           VERSIONS=`python tools/getVersions.py`
           echo $VERSIONS
-          echo "::set-output name=value::${VERSIONS}"
+          echo "value=${VERSIONS}" >> $GITHUB_OUTPUT
 
   build:
     runs-on: ubuntu-latest
@@ -62,10 +62,10 @@ jobs:
       - name: Manage matrix
         id: manage-matrix
         run: |
-          echo "::set-output name=groupId::${{ fromJson(matrix.versions).groupId }}"
-          echo "::set-output name=javadoc_version::${{ fromJson(matrix.versions).javadoc_version }}"
-          echo "::set-output name=version::${{ fromJson(matrix.versions).version }}"
-          echo "::set-output name=java_version::${{ fromJson(matrix.versions).java_version }}"
+          echo "groupId=${{ fromJson(matrix.versions).groupId }}" >> $GITHUB_OUTPUT
+          echo "javadoc_version=${{ fromJson(matrix.versions).javadoc_version }}" >> $GITHUB_OUTPUT
+          echo "version=${{ fromJson(matrix.versions).version }}" >> $GITHUB_OUTPUT
+          echo "java_version=${{ fromJson(matrix.versions).java_version }}" >> $GITHUB_OUTPUT
 
       - name: Set up JDK ${{ steps.manage-matrix.outputs.java_version }}
         uses: actions/setup-java@v2
