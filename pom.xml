@@ -6,12 +6,13 @@
 
     <groupId>com.tomacheese</groupId>
     <artifactId>eventfinder</artifactId>
-    <version>0.0.0</version>
+    <version>${version}</version>
     <packaging>jar</packaging>
 
     <name>EventFinder</name>
 
     <properties>
+        <version>0.0.0</version>
         <papermc.groupId>com.destroystokyo.paper</papermc.groupId>
         <papermc.artifactId>paper-api</papermc.artifactId>
         <papermc.version>1.16.5-R0.1-SNAPSHOT</papermc.version>
