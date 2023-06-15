@@ -21,14 +21,6 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Cache local Maven repository
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
   get-versions:
     runs-on: ubuntu-latest
     needs: [ setup ]
@@ -106,6 +98,21 @@ jobs:
         with:
           java-version: ${{ steps.manage-matrix.outputs.java_version }}
           distribution: adopt
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Cache event files
+        uses: actions/cache@v3
+        id: cache-event-files
+        with:
+          path: src/main/java/com/tomacheese/eventfinder/listeners
+          key: ${{ runner.os }}-eventfiles-${{ steps.manage-matrix.outputs.version }}
 
       - name: Install dependencies
         run: |
