@@ -18,19 +18,11 @@ jobs:
       - name: Setup Python 3
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
-
-      - name: Cache local Maven repository
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+          python-version: "3.x"
 
   get-versions:
     runs-on: ubuntu-latest
-    needs: [ setup ]
+    needs: [setup]
 
     outputs:
       versions: ${{ steps.versions.outputs.value }}
@@ -48,7 +40,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    needs: [ setup, get-versions ]
+    needs: [setup, get-versions]
 
     strategy:
       fail-fast: false
@@ -73,12 +65,28 @@ jobs:
           java-version: ${{ steps.manage-matrix.outputs.java_version }}
           distribution: adopt
 
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Cache event files
+        uses: actions/cache@v3
+        id: cache-event-files
+        with:
+          path: src/main/java/com/tomacheese/eventfinder/listeners
+          key: ${{ runner.os }}-eventfiles-${{ steps.manage-matrix.outputs.version }}
+
       - name: Install dependencies
         run: |
           pip install requests
           pip install beautifulsoup4
 
       - name: Create event files
+        if: steps.cache-event-files.outputs.cache-hit != 'true'
         run: python tools/getEvents.py ${{ steps.manage-matrix.outputs.javadoc_version }}
 
       - name: Build with Maven
@@ -90,12 +98,3 @@ jobs:
           name: ${{ steps.manage-matrix.outputs.version }}
           path: |
             target/*.jar
-
-  finished:
-    runs-on: ubuntu-latest
-    needs: [ setup, get-versions, build ]
-
-    steps:
-      - name: Finished
-        run: |
-          echo "Finished"
