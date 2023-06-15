@@ -90,3 +90,12 @@ jobs:
           name: ${{ steps.manage-matrix.outputs.version }}
           path: |
             target/*.jar
+
+  finished:
+    runs-on: ubuntu-latest
+    needs: [ setup, get-versions, build ]
+
+    steps:
+      - name: Finished
+        run: |
+          echo "Finished"
