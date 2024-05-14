@@ -1,42 +1,8 @@
-import pathlib
 import re
 import textwrap
 import sys
 import requests
 from bs4 import BeautifulSoup
-
-
-def get_from_noframe(version: str):
-    url = "https://papermc.io/javadocs/paper/" + version + "/allclasses-noframe.html"
-
-    html = requests.get(url)
-    if html.status_code != 200:
-        return None
-    soup = BeautifulSoup(html.text, "html.parser")
-
-    indexContainer = soup.find("div", {"class": "indexContainer"})
-    if indexContainer is None:
-        print("Not found indexContainer.")
-        return None
-
-    return indexContainer.find("ul").find_all("li")
-
-
-def get_from_index(version: str):
-    url = "https://papermc.io/javadocs/paper/" + version + "/allclasses-index.html"
-
-    html = requests.get(url)
-    if html.status_code != 200:
-        return None
-    soup = BeautifulSoup(html.text, "html.parser")
-
-    table = soup.find("div", {"id": "all-classes-table.tabpanel"})
-    if table is None:
-        print("Not found all-classes-table.tabpanel.")
-        return None
-
-    return table.select("div.col-first.all-classes-table")
-
 
 def get_sub_classes(version: str,
                     className: str):
@@ -73,9 +39,8 @@ def get_sub_classes(version: str,
 def main():
     version = sys.argv[1]
 
-    pattern = re.compile(r"^[1-9]+\.[0-9]+")
-    if pattern.fullmatch(version) is None:
-        version = pattern.match(version).group()
+    if version == "null":
+        raise Exception("Version is null")
 
     sub_classes = get_sub_classes(version, "org.bukkit.event.Event")
     print("sub_classes count: %s" % len(sub_classes))
