@@ -8,8 +8,12 @@ on:
       - main
 
 jobs:
-  setup:
+  get-versions:
+    name: Get versions
     runs-on: ubuntu-latest
+
+    outputs:
+      versions: ${{ steps.versions.outputs.value }}
 
     steps:
       - name: Checkout
@@ -20,27 +24,21 @@ jobs:
         with:
           python-version: "3.x"
 
-  get-versions:
-    runs-on: ubuntu-latest
-    needs: [setup]
-
-    outputs:
-      versions: ${{ steps.versions.outputs.value }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4 semver
 
       - name: Get versions
         id: versions
         run: |
-          VERSIONS=`python tools/getVersions.py`
+          VERSIONS=`python tools/get-versions.py`
           echo $VERSIONS
           echo "value=${VERSIONS}" >> $GITHUB_OUTPUT
 
   build:
+    name: Build (${{ fromJson(matrix.versions).version }})
     runs-on: ubuntu-latest
-    needs: [setup, get-versions]
+    needs: [get-versions]
 
     strategy:
       fail-fast: false
@@ -51,13 +49,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4
 
+      - name: Setup Python 3
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4 semver
+
       - name: Manage matrix
         id: manage-matrix
         run: |
-          echo "groupId=${{ fromJson(matrix.versions).groupId }}" >> $GITHUB_OUTPUT
-          echo "javadoc_version=${{ fromJson(matrix.versions).javadoc_version }}" >> $GITHUB_OUTPUT
-          echo "version=${{ fromJson(matrix.versions).version }}" >> $GITHUB_OUTPUT
-          echo "java_version=${{ fromJson(matrix.versions).java_version }}" >> $GITHUB_OUTPUT
+          echo "groupId=${{ fromJson(matrix.versions).groupId }}" | tee -a $GITHUB_OUTPUT
+          echo "javadoc_version=${{ fromJson(matrix.versions).javadoc_version }}" | tee -a $GITHUB_OUTPUT
+          echo "version=${{ fromJson(matrix.versions).version }}" | tee -a $GITHUB_OUTPUT
+          echo "java_version=${{ fromJson(matrix.versions).java_version }}" | tee -a $GITHUB_OUTPUT
 
       - name: Set up JDK ${{ steps.manage-matrix.outputs.java_version }}
         uses: actions/setup-java@v4
@@ -80,14 +87,9 @@ jobs:
           path: src/main/java/com/tomacheese/eventfinder/listeners
           key: ${{ runner.os }}-eventfiles-${{ steps.manage-matrix.outputs.version }}
 
-      - name: Install dependencies
-        run: |
-          pip install requests
-          pip install beautifulsoup4
-
       - name: Create event files
         if: steps.cache-event-files.outputs.cache-hit != 'true'
-        run: python tools/getEvents.py ${{ steps.manage-matrix.outputs.javadoc_version }}
+        run: python tools/get-events.py ${{ steps.manage-matrix.outputs.javadoc_version }}
 
       - name: Build with Maven
         run: mvn package -Djava.version=${{ steps.manage-matrix.outputs.java_version }} -Dpapermc.groupId=${{ steps.manage-matrix.outputs.groupId }} -Dpapermc.version=${{ steps.manage-matrix.outputs.version }}
@@ -101,8 +103,8 @@ jobs:
 
   finished:
     runs-on: ubuntu-latest
-    needs: [setup, get-versions, build]
-    
+    needs: [get-versions, build]
+
     steps:
       - name: Finished
         run: echo finished
