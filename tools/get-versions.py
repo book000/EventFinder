@@ -81,28 +81,31 @@ def is_supported_version(version):
     return semver.match(ajusted_version, ">=1.16.5")
 
 
+def check_javadoc_version(version, expected_version):
+    response = requests.get(f"https://jd.papermc.io/paper/{version}/")
+    if response.status_code != 200:
+        return False
+
+    soup = BeautifulSoup(response.text, "html.parser")
+    h1 = soup.find("h1")
+    if h1 is None:
+        return False
+    h1_text = h1.text
+    return expected_version in h1_text
+
+
 def get_javadoc_version(version):
     # https://jd.papermc.io/paper/<version>/ にアクセスし、404が返ってきたらメジャーバージョンで存在確認を行う。
     # メジャーバージョンでの存在確認の場合、h1タグのテキストを確認し、"paper-api <version>-R0.1-SNAPSHOT API" の <version> が一致するか確認する。
-    ajusted_version = get_version(version)
-    response = requests.get(f"https://jd.papermc.io/paper/{ajusted_version}/")
-    if response.status_code == 200:
-        return ajusted_version
+    adjusted_version = get_version(version)
+    if check_javadoc_version(adjusted_version, version):
+        return version
 
-    major_version = get_major_version(ajusted_version)
-    if major_version == ajusted_version:
+    major_version = get_major_version(adjusted_version)
+    if major_version == adjusted_version:
         return None
-    major_response = requests.get(f"https://jd.papermc.io/paper/{major_version}/")
-    if major_response.status_code != 200:
-        return None
-
-    soup = BeautifulSoup(major_response.text, "html.parser")
-    h1 = soup.find("h1")
-    if h1 is None:
-        return None
-    h1_text = h1.text
-    if version in h1_text:
-        return major_version
+    if check_javadoc_version(major_version, version):
+        return version
 
     return None
 
