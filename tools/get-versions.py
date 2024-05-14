@@ -77,6 +77,10 @@ def is_supported_version(version):
         return False
 
     ajusted_version = get_semver_ajusted_version(version)
+    # 1.20.5-R0.1-SNAPSHOT は net.kyori:adventure-bom が 4.17.0-SNAPSHOT を指しておりビルドできないため除外
+    if semver.match(ajusted_version, "1.20.5"):
+        return False
+
     # PaperMC 1.16.5以降をサポートする
     return semver.match(ajusted_version, ">=1.16.5")
 
