@@ -137,6 +137,6 @@ for version in get_paper_io_maven():
     }))
 
 # javadocが存在しないバージョンを除外
-versions = list(filter(lambda x: x["javadoc_version"] is not None, versions))
+versions = list(filter(lambda x: json.loads(x)["javadoc_version"] is not None, versions))
 
 print(json.dumps(versions))
