@@ -4,8 +4,7 @@ from xml.etree import ElementTree
 
 import requests
 import semver
-
-already_found_javadocs = []
+from bs4 import BeautifulSoup
 
 
 def get_destroystokyo_com_maven():
@@ -73,32 +72,36 @@ def get_java_version(version):
 
 
 def is_supported_version(version):
+    # rc, pre, snapshotなどのバージョンはサポートしない
+    if "rc" in version or "pre" in version or "snapshot" in version:
+        return False
+
     ajusted_version = get_semver_ajusted_version(version)
     # PaperMC 1.16.5以降をサポートする
     return semver.match(ajusted_version, ">=1.16.5")
 
-def check_exists_javadocs(version):
-    global already_found_javadocs
-    if version in already_found_javadocs:
-        return True
-
-    response = requests.get(f"https://jd.papermc.io/paper/{version}/")
-    if response.status_code == 200:
-        already_found_javadocs.append(version)
-        return True
-    return False
-
 
 def get_javadoc_version(version):
     # https://jd.papermc.io/paper/<version>/ にアクセスし、404が返ってきたらメジャーバージョンで存在確認を行う。
+    # メジャーバージョンでの存在確認の場合、h1タグのテキストを確認し、"paper-api <version>-R0.1-SNAPSHOT API" の <version> が一致するか確認する。
     ajusted_version = get_version(version)
-    if check_exists_javadocs(ajusted_version):
+    response = requests.get(f"https://jd.papermc.io/paper/{ajusted_version}/")
+    if response.status_code == 200:
         return ajusted_version
 
     major_version = get_major_version(ajusted_version)
     if major_version == ajusted_version:
         return None
-    if check_exists_javadocs(major_version):
+    major_response = requests.get(f"https://jd.papermc.io/paper/{major_version}/")
+    if major_response.status_code != 200:
+        return None
+
+    soup = BeautifulSoup(major_response.text, "html.parser")
+    h1 = soup.find("h1")
+    if h1 is None:
+        return None
+    h1_text = h1.text
+    if version in h1_text:
         return major_version
 
     return None
@@ -132,5 +135,8 @@ for version in get_paper_io_maven():
         "version": version,
         "java_version": java_version
     }))
+
+# javadocが存在しないバージョンを除外
+versions = list(filter(lambda x: x["javadoc_version"] is not None, versions))
 
 print(json.dumps(versions))
