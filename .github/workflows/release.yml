@@ -117,7 +117,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4
+          pip install requests beautifulsoup4 semver
 
       - name: Create event files
         run: python tools/get-events.py ${{ steps.manage-matrix.outputs.javadoc_version }}
