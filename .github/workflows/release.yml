@@ -127,7 +127,7 @@ jobs:
         run: mvn package -Dversion=${{ needs.create-release.outputs.version }} -Djava.version=${{ steps.manage-matrix.outputs.java_version }} -Dpapermc.groupId=${{ steps.manage-matrix.outputs.groupId }} -Dpapermc.version=${{ steps.manage-matrix.outputs.version }}
 
       - name: Upload Release Asset
-        uses: shogo82148/actions-upload-release-asset@v1.7.9
+        uses: shogo82148/actions-upload-release-asset@v1.8.0
         with:
           upload_url: ${{ needs.create-release.outputs.release-upload-url }}
           asset_path: target/*-${{ steps.manage-matrix.outputs.version }}.jar
