@@ -100,7 +100,7 @@ jobs:
           pip install requests beautifulsoup4 semver
 
       - name: Set up JDK ${{ steps.manage-matrix.outputs.java_version }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ steps.manage-matrix.outputs.java_version }}
           distribution: adopt
