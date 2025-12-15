@@ -73,7 +73,7 @@ jobs:
           distribution: adopt
 
       - name: Cache local Maven repository
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -81,7 +81,7 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Cache event files
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache-event-files
         with:
           path: src/main/java/com/tomacheese/eventfinder/listeners
