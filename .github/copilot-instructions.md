@@ -1,7 +1,7 @@
 # GitHub Copilot Instructions
 
 ## プロジェクト概要
-- 目的: [日本語の README はこちらから](README-ja.md)
+PaperMC 1.16.5以降用プラグイン。Minecraftサーバで発生したイベント情報をチャットに表示する。
 
 ## 共通ルール
 - 会話は日本語で行う。
@@ -11,8 +11,8 @@
 - 既存のプロジェクトルールがある場合はそれを優先する。
 
 ## 技術スタック
-- 言語: Unknown
-- パッケージマネージャー: pnpm 優先（ロックファイルに従う）。
+- 言語: Java
+- パッケージマネージャー: Maven
 
 ## コーディング規約
 - フォーマット: 既存設定（ESLint / Prettier / formatter）に従う。
@@ -23,9 +23,20 @@
 - TypeScript 使用時は strict 前提とし、`skipLibCheck` で回避しない。
 - 関数やインターフェースには docstring（JSDoc など）を記載する。
 
-## 開発コマンド
+### 開発コマンド
 ```bash
-# README を確認してください
+# install
+mvn install
+
+# dev
+mvn compile
+
+# build
+mvn clean package
+
+# test
+mvn test
+
 ```
 
 ## テスト方針
@@ -36,5 +47,11 @@
 - ログに機密情報を出力しない。
 
 ## ドキュメント更新
+- 実装確定後、同一コミットまたは追加コミットで更新する。
+- README、API ドキュメント、コメント等は常に最新状態を保つ。
 
 ## リポジトリ固有
+- Minecraftプラグイン開発
+- イベント情報の動的表示機能
+- フィルタリング機能付き
+- 設定のセーブ/ロード対応
