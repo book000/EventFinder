@@ -93,7 +93,7 @@ mvn package -DskipTests
 ## リポジトリ固有
 
 - このプラグインは PaperMC 1.16.5 以降の Minecraft サーバーで動作する
-- イベントは Reflections ライブラリで自動検出される (`org.bukkit.event` パッケージ)
+- イベントリスナーは Reflections ライブラリにより `com.tomacheese.eventfinder.listeners` パッケージから自動検出される (`org.bukkit.event` パッケージは `config.yml` の色分け設定にのみ使用される)
 - チャットメッセージは Adventure API の `Component` で構築する
 - 国際化リソースは `src/main/resources/i18n/` 配下の YAML ファイルで管理する
 - ビルド成果物は `target/` ディレクトリに生成される

@@ -85,11 +85,11 @@ mvn package -DskipTests
 ## リポジトリ固有
 
 - このプラグインは PaperMC 1.16.5 以降の Minecraft サーバーで動作する
-- イベントは Reflections ライブラリで自動検出される (`org.bukkit.event` パッケージ)
+- イベントは Reflections ライブラリで自動検出される (`com.tomacheese.eventfinder.listeners` パッケージ)
 - チャットメッセージは Adventure API の `Component` で構築する
 - 国際化リソースは `src/main/resources/i18n/` 配下の YAML ファイルで管理する
 - ビルド成果物は `target/` ディレクトリに生成される
 - GitHub Actions CI では Java 8 (adopt distribution) を使用してビルド・テストが実行される
 - フラットワールドでの使用を推奨 (イベント量が管理しやすいため)
-- 非推奨イベントは取り消し線で表示される
+- 非推奨イベントはアスタリスク (`*`) 付きで表示され、キャンセル済みイベントは取り消し線で表示される
 - パッケージごとに色分けされたチャットメッセージが表示される

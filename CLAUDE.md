@@ -199,7 +199,8 @@ src/
 ## リポジトリ固有
 
 - このプラグインは PaperMC 1.16.5 以降で動作する
-- イベントは Reflections ライブラリを使用して自動検出される (`org.bukkit.event` パッケージ)
+- イベントは Reflections ライブラリを使用して `com.tomacheese.eventfinder.listeners` パッケージ内の Listener クラスから自動検出される
+- `org.bukkit.event` パッケージは `config.yml` 上でのパッケージ別カラー設定にのみ使用され、自動検出の対象ではない
 - チャットメッセージは Adventure API を使用して表示される
 - 国際化 (i18n) は `src/main/resources/i18n/` 配下の YAML ファイルで管理される
 - ビルド成果物は `target/` ディレクトリに生成される
