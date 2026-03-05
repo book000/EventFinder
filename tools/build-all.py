@@ -11,8 +11,15 @@ import semver
 from bs4 import BeautifulSoup
 
 LISTENERS_DIR = "./src/main/java/com/tomacheese/eventfinder/listeners"
-MVN = os.path.expanduser("~/tools/apache-maven-3.9.9/bin/mvn")
-JAVA_HOME = os.path.expanduser("~/tools/jdk-21.0.6+7")
+# Maven 実行ファイル（環境変数 MVN でオーバーライド可能）
+MVN = os.environ.get("MVN", os.path.expanduser("~/tools/apache-maven-3.9.9/bin/mvn"))
+# Java バージョンごとの JAVA_HOME（環境変数でオーバーライド可能）
+JAVA_HOMES = {
+    "8": os.environ.get("JAVA8_HOME", os.path.expanduser("~/tools/jdk8u432-b06")),
+    "11": os.environ.get("JAVA11_HOME", os.path.expanduser("~/tools/jdk-21.0.6+7")),
+    "16": os.environ.get("JAVA16_HOME", os.path.expanduser("~/tools/jdk-21.0.6+7")),
+    "21": os.environ.get("JAVA21_HOME", os.path.expanduser("~/tools/jdk-21.0.6+7")),
+}
 
 
 def get_maven_versions(url):
@@ -28,7 +35,10 @@ def get_maven_versions(url):
 def is_supported(version):
     """バージョンがビルド対象としてサポートされているか判定する。
 
-    rc / pre / snapshot・no-moonrise バリアント・1.20.5・1.16.5 未満は除外する。
+    小文字の rc / pre / snapshot を含むバリアント・no-moonrise バリアント・
+    1.20.5・1.16.5 未満は除外する。
+    なお Maven の標準的なリリース命名（例: 1.21.5-R0.1-SNAPSHOT）は
+    大文字 SNAPSHOT のため、このチェックでは除外されない（意図的）。
     """
     if any(x in version for x in ["rc", "pre", "snapshot"]):
         return False
@@ -145,9 +155,12 @@ def generate_listeners(javadoc_version):
 
 def build(version_info):
     """Maven でビルドを実行"""
+    # java_version に応じて JAVA_HOME を切り替える
+    java_home = JAVA_HOMES.get(version_info["java_version"], JAVA_HOMES["21"])
+    mvn_dir = os.path.dirname(os.path.abspath(MVN))
     env = os.environ.copy()
-    env["JAVA_HOME"] = JAVA_HOME
-    env["PATH"] = f"{JAVA_HOME}/bin:{os.path.expanduser('~/tools/apache-maven-3.9.9/bin')}:{env['PATH']}"
+    env["JAVA_HOME"] = java_home
+    env["PATH"] = f"{java_home}/bin:{mvn_dir}:{env['PATH']}"
 
     cmd = [
         MVN, "package",

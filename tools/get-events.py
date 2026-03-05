@@ -9,8 +9,11 @@ def get_sub_classes_from_tree(version: str, base_class_path: str):
     クラスページが空（0 バイト）のときに使用する。"""
     print("get_sub_classes_from_tree: using overview-tree.html fallback")
     url = "https://jd.papermc.io/paper/%s/overview-tree.html" % version
-    html = requests.get(url)
-    soup = BeautifulSoup(html.text, "html.parser")
+    response = requests.get(url)
+    if response.status_code != 200:
+        print("Failed to fetch overview-tree.html: HTTP %s" % response.status_code, file=sys.stderr)
+        return []
+    soup = BeautifulSoup(response.text, "html.parser")
 
     # base_class_path に対応する <a> タグを探す（例: "org/bukkit/event/Event.html"）
     event_a = None
