@@ -30,8 +30,10 @@ def get_sub_classes_from_tree(version: str, base_class_path: str):
     if li is None:
         return []
 
-    # この <li> の配下にある全クラスリンクを収集する
+    # この <li> の直下にある <ul>（サブクラスリスト）から全クラスリンクを収集する
+    # <li> 全体を対象にすると base_class_path 自身の <a> タグも含まれてしまうため、<ul> に限定する
     def collect_classes(node):
+        """指定ノード配下の type-name-link クラスを持つ <a> タグからクラス名一覧を返す。"""
         result = []
         for a in node.find_all("a", class_="type-name-link"):
             title = a.get("title", "")
@@ -43,7 +45,10 @@ def get_sub_classes_from_tree(version: str, base_class_path: str):
                 result.append(package + "." + simple_name)
         return result
 
-    return collect_classes(li)
+    sub_ul = li.find("ul")
+    if sub_ul is None:
+        return []
+    return collect_classes(sub_ul)
 
 
 def get_sub_classes(version: str,
@@ -54,7 +59,7 @@ def get_sub_classes(version: str,
 
     html = requests.get(url)
 
-    # クラスページが空の場合は overview-tree.html からフォールバック取得
+    # org.bukkit.event.Event のクラスページが空（0 バイト）の場合は overview-tree.html からフォールバック取得
     if not html.text.strip() and className == "org.bukkit.event.Event":
         return get_sub_classes_from_tree(version, className.replace(".", "/") + ".html")
 

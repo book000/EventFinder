@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 """全バージョンのビルドを順に実行するスクリプト"""
 
-import json
 import os
-import re
-import shutil
 import subprocess
 import sys
 from xml.etree import ElementTree
@@ -19,6 +16,7 @@ JAVA_HOME = os.path.expanduser("~/tools/jdk-21.0.6+7")
 
 
 def get_maven_versions(url):
+    """Maven リポジトリの XML メタデータからバージョン一覧を取得する。"""
     response = requests.get(url)
     if response.status_code != 200:
         print(f"WARNING: {url} returned {response.status_code}", file=sys.stderr)
@@ -28,6 +26,10 @@ def get_maven_versions(url):
 
 
 def is_supported(version):
+    """バージョンがビルド対象としてサポートされているか判定する。
+
+    rc / pre / snapshot・no-moonrise バリアント・1.20.5・1.16.5 未満は除外する。
+    """
     if any(x in version for x in ["rc", "pre", "snapshot"]):
         return False
     # no-moonrise は専用 Javadoc がなく標準 Javadoc とAPI差異があるため除外
@@ -46,6 +48,7 @@ def is_supported(version):
 
 
 def get_java_version(version):
+    """PaperMC バージョンに対応する Java バージョン文字列を返す。"""
     v = version.split("-")[0]
     if v.count(".") == 1:
         v += ".0"
@@ -65,7 +68,7 @@ def check_javadoc(version):
     v = version.split("-")[0]
     r = requests.get(f"https://jd.papermc.io/paper/{v}/")
     if r.status_code == 200:
-        # リダイレクト後の実際のURLバージョンを確認
+        # リダイレクト後の実際の URL バージョンを確認
         actual = r.url.rstrip("/").split("/")[-1]
         # 別バージョンにリダイレクトされた場合は専用 Javadoc なし → スキップ
         if actual != v:
@@ -78,6 +81,7 @@ def check_javadoc(version):
 
 
 def get_all_versions():
+    """両 groupId の Maven リポジトリからサポート対象バージョンの一覧を返す。"""
     versions = []
 
     # com.destroystokyo.paper (旧 groupId: 1.16.x まで)
@@ -160,11 +164,14 @@ def build(version_info):
         for line in result.stdout.splitlines():
             if "[ERROR]" in line:
                 print(f"    {line}")
+        if result.stderr:
+            print(f"  STDERR:\n{result.stderr}")
         return False
     return True
 
 
 def main():
+    """全バージョンのリスナー生成とビルドを順番に実行し、結果を報告する。"""
     print("=== バージョン一覧の取得 ===")
     versions = get_all_versions()
     print(f"\n対象バージョン数: {len(versions)}")
@@ -190,7 +197,7 @@ def main():
         # ビルド
         print(f"  Building (Java {v['java_version']})...")
         if build(v):
-            jar = f"target/EventFinder-0.0.0-{version_str}.jar"
+            jar = f"target/EventFinder-0.0.0-{version_str}.jar"  # pom.xml の <version>0.0.0</version> に合わせた固定値
             size = os.path.getsize(jar) // 1024 if os.path.exists(jar) else 0
             print(f"  SUCCESS: {jar} ({size} KB)")
             results["success"].append(version_str)
