@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 
 def get_destroystokyo_com_maven():
     response = requests.get(
-        "https://papermc.io/repo/repository/maven-public/com/destroystokyo/paper/paper-api/maven-metadata.xml")
+        "https://repo.papermc.io/repository/maven-public/com/destroystokyo/paper/paper-api/maven-metadata.xml")
     if response.status_code != 200:
         return None
     xml = ElementTree.fromstring(response.text)
@@ -24,7 +24,7 @@ def get_destroystokyo_com_maven():
 
 def get_paper_io_maven():
     response = requests.get(
-        "https://papermc.io/repo/repository/maven-public/io/papermc/paper/paper-api/maven-metadata.xml")
+        "https://repo.papermc.io/repository/maven-public/io/papermc/paper/paper-api/maven-metadata.xml")
     if response.status_code != 200:
         return None
     xml = ElementTree.fromstring(response.text)

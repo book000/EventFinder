@@ -4,13 +4,68 @@ import sys
 import requests
 from bs4 import BeautifulSoup
 
+def get_sub_classes_from_tree(version: str, base_class_path: str):
+    """overview-tree.html からサブクラス一覧を取得するフォールバック関数。
+    クラスページが空（0 バイト）のときに使用する。"""
+    print("get_sub_classes_from_tree: using overview-tree.html fallback")
+    url = "https://jd.papermc.io/paper/%s/overview-tree.html" % version
+    response = requests.get(url)
+    if response.status_code != 200:
+        print("Failed to fetch overview-tree.html: HTTP %s" % response.status_code, file=sys.stderr)
+        return []
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    # base_class_path に対応する <a> タグを探す（例: "org/bukkit/event/Event.html"）
+    event_a = None
+    for a in soup.find_all("a", href=True):
+        if a.get("href") == base_class_path:
+            event_a = a
+            break
+
+    if event_a is None:
+        return []
+
+    # <li> まで遡る
+    li = event_a
+    while li and li.name != "li":
+        li = li.parent
+
+    if li is None:
+        return []
+
+    # この <li> の直下にある <ul>（サブクラスリスト）から全クラスリンクを収集する
+    # <li> 全体を対象にすると base_class_path 自身の <a> タグも含まれてしまうため、<ul> に限定する
+    def collect_classes(node):
+        """指定ノード配下の type-name-link クラスを持つ <a> タグからクラス名一覧を返す。"""
+        result = []
+        for a in node.find_all("a", class_="type-name-link"):
+            title = a.get("title", "")
+            parts = title.split(" ")
+            # title 例: "class in org.bukkit.event.block"
+            if len(parts) >= 3 and parts[0] == "class":
+                package = parts[-1]
+                simple_name = a.text.strip()
+                result.append(package + "." + simple_name)
+        return result
+
+    sub_ul = li.find("ul")
+    if sub_ul is None:
+        return []
+    return collect_classes(sub_ul)
+
+
 def get_sub_classes(version: str,
                     className: str):
     print("get_sub_classes: %s" % className)
     sub_classes = []
-    url = "https://papermc.io/javadocs/paper/%s/%s.html" % (version, className.replace(".", "/"))
+    url = "https://jd.papermc.io/paper/%s/%s.html" % (version, className.replace(".", "/"))
 
     html = requests.get(url)
+
+    # org.bukkit.event.Event のクラスページが空（0 バイト）の場合は overview-tree.html からフォールバック取得
+    if not html.text.strip() and className == "org.bukkit.event.Event":
+        return get_sub_classes_from_tree(version, className.replace(".", "/") + ".html")
+
     soup = BeautifulSoup(html.text, "html.parser")
     notes = soup.find_all("dl", {"class": "notes"})
     sub_classes_tags = []
