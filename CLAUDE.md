@@ -155,9 +155,9 @@ src/
 ## テスト
 
 - **テストフレームワーク**: JUnit 4 (モックライブラリは導入していない)
-- **既存テスト**: `src/test/java/MainTest.java` は i18n リソースの検証のみを行う
-  - `isCorrectI18nFile`: `i18n/*.yml` のファイル名が有効なロケール名であること
-  - `isAllDefinedI18nFileContents`: 各言語ファイルに `I18nMsgType` の全定義が揃っていること
+- **既存テスト**: `src/test/java/MainTest.java` は i18n リソースのみを対象とする
+  - `isAllDefinedI18nFileContents`: 各言語ファイルに `I18nMsgType` の全定義が揃っているか検証する
+  - `isCorrectI18nFile`: `i18n/*.yml` のファイル名を `Locale.getAvailableLocales()` と突き合わせる。ただし `Locale#toString()` はアンダースコア区切り (`ja_JP`) を返す一方、ファイル名はハイフン区切り (`ja-JP`) のため、現状のファイル群では実質的な検証になっていない点に注意
 - **テスト方針**: 新規機能追加時は、可能な範囲で対応するテストケースを追加する
 - **テストコマンド**: `mvn test`
 
