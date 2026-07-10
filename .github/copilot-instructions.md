@@ -1,84 +1,49 @@
-# GitHub Copilot Instructions
+# GitHub Copilot コードレビュー指示
 
-## プロジェクト概要
+EventFinder (PaperMC 1.16.5 向けイベント表示プラグイン、Java 8 / Maven) の
+プルリクエストをレビューする際の観点。開発手順は `CLAUDE.md` を参照。
 
-- 目的: Minecraft サーバー (PaperMC) で発生したイベントをチャット欄に表示するプラグイン
-- 主な機能: イベントの自動検出、チャット表示、非表示フィルター管理、国際化対応
-- 対象ユーザー: Minecraft サーバー管理者、開発者
+## レビュー言語
 
-## 共通ルール
-
-- 会話は日本語で行う。
-- PR とコミットは Conventional Commits に従う。`<description>` は日本語で記載する。
-  - 例: `feat: イベントフィルター機能を追加`
+- レビューコメントは日本語で記載する。
 - 日本語と英数字の間には半角スペースを入れる。
 
-## 技術スタック
+## 規約として確認する点
 
-- 言語: Java 8
-- フレームワーク: PaperMC 1.16.5 API
-- ビルドツール: Maven
-- 主要ライブラリ:
-  - Adventure API 4.26.1 (チャットメッセージ表示)
-  - Reflections 0.10.2 (イベント自動検出)
-  - JUnit 4.13.2 (テスト)
+このリポジトリには Checkstyle 等の linter 設定は無く、規約は以下を目視で確認する。
 
-## コーディング規約
+- ソースエンコーディングは UTF-8、インデントはスペース 4 つ。
+- コード内コメントは日本語。ユーザー/ログ向けエラーメッセージは英語。
+- public なクラス・メソッドには日本語の JavaDoc があること。
+- `java.version` は 1.8。Java 9 以降でしか使えない API を新規に導入していないこと。
 
-- 文字コード: UTF-8
-- Java バージョン: 1.8
-- コメント: 日本語で記載する
-- エラーメッセージ: 英語で記載する
-- 命名規則: Java 標準の命名規則に従う (camelCase, PascalCase)
-- インデント: スペース 4 つ
-- docstring: すべての public メソッドとクラスに JavaDoc を日本語で記載する
+## 重点的に確認する点
 
-## 開発コマンド
+- **国際化**: プレイヤー向けの文言をハードコードしていないか。新規メッセージは
+  `src/main/resources/i18n/ja-JP.yml` と `en-US.yml` の両方に追加され、
+  `I18nMsgType` 経由で参照されているか。
+- **チャット表示**: `org.bukkit.ChatColor` や旧来の文字列連結ではなく、
+  Adventure API の `Component` / `NamedTextColor` を使用しているか。
+- **イベントリスナー**: `com.tomacheese.eventfinder.listeners` パッケージに配置され、
+  手動登録ではなく Reflections による自動検出に委ねているか。
+- **設定の永続化**: フィルター条件など設定の load/save が `config.yml` /
+  `FileConfiguration` の既存パターンに沿っているか。
+- **エラーハンドリング**: 既存エラーメッセージが先頭に絵文字を持つ場合、
+  追加するメッセージも内容に即した一文字の絵文字を付けているか。
+- **plugin.yml との整合**: コマンドやパーミッションの追加・変更時に
+  `src/main/resources/plugin.yml` が更新されているか。
+- **ドキュメント整合**: 機能・コマンド変更時に `README.md` / `README-ja.md` が
+  更新されているか。
 
-```bash
-# 依存関係の解決
-mvn dependency:resolve
+## セキュリティ
 
-# ビルド (テスト含む)
-mvn package
+- API キーや認証情報がコミットされていないか。
+- ログにプレイヤーの個人情報や機密情報を出力していないか。
 
-# クリーン
-mvn clean
+## フラグすべきでない既知パターン
 
-# テスト実行
-mvn test
-
-# ビルド (テストなし)
-mvn package -DskipTests
-```
-
-## テスト方針
-
-- テストフレームワーク: JUnit 4
-- テストディレクトリ: `src/test/java/`
-- 新規機能追加時は、対応するテストケースを追加する
-- テストコマンド: `mvn test`
-
-## セキュリティ / 機密情報
-
-- API キーや認証情報を Git にコミットしない
-- ログに機密情報を出力しない
-- プレイヤーの個人情報を適切に扱う
-
-## ドキュメント更新
-
-コードを変更する際は、以下のドキュメントも更新する：
-
-- `README.md` / `README-ja.md`: 機能追加、コマンド変更時
-- `src/main/resources/plugin.yml`: コマンドやパーミッション変更時
-- `src/main/resources/i18n/*.yml`: メッセージ追加・変更時
-- JavaDoc: クラス・メソッド追加・変更時
-
-## リポジトリ固有
-
-- このプラグインは PaperMC 1.16.5 以降で動作する
-- イベントは Reflections ライブラリを使用して自動検出される
-- チャットメッセージは Adventure API を使用して表示される
-- 国際化 (i18n) は `src/main/resources/i18n/` 配下の YAML ファイルで管理される
-- ビルド成果物は `target/` ディレクトリに生成される
-- GitHub Actions CI では `mvn -B package` でビルド・テストが実行される
+- Reflections によるリスナーの自動検出（明示的な登録が無くても正しい）。
+- `src/main/java/com/tomacheese/eventfinder/listeners/.gitkeep`（空ディレクトリ維持用）。
+- `org.bukkit.event` パッケージ名の参照は `config.yml` の色分け設定用であり、
+  自動検出対象ではない（未使用ではない）。
+- `pom.xml` の `${version}` プレースホルダーはビルド時に差し込まれる（誤設定ではない）。
