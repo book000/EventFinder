@@ -77,6 +77,9 @@ def is_supported_version(version):
         return False
 
     ajusted_version = get_semver_ajusted_version(version)
+    # 26.1.1.build.8 のように SemVer として解釈できないバージョンはサポートしない
+    if not semver.Version.is_valid(ajusted_version):
+        return False
     # 1.20.5-R0.1-SNAPSHOT は net.kyori:adventure-bom が 4.17.0-SNAPSHOT を指しておりビルドできないため除外
     if semver.match(ajusted_version, "1.20.5"):
         return False
