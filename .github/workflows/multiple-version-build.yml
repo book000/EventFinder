@@ -95,7 +95,7 @@ jobs:
         run: mvn package -Djava.version=${{ steps.manage-matrix.outputs.java_version }} -Dpapermc.groupId=${{ steps.manage-matrix.outputs.groupId }} -Dpapermc.version=${{ steps.manage-matrix.outputs.version }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ steps.manage-matrix.outputs.version }}
           path: |
