@@ -1,3 +1,9 @@
 {
-  "extends": ["github>book000/templates//renovate/base-public"]
+  "extends": ["github>book000/templates//renovate/base-public"],
+  "packageRules": [
+    {
+      "matchPackageNames": ["net.kyori:adventure-api"],
+      "allowedVersions": "<5"
+    }
+  ]
 }
