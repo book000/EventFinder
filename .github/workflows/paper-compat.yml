@@ -98,3 +98,13 @@ jobs:
 
       - name: Run smoke test
         run: tools/smoke-test.sh ${{ matrix.version }} plugin/EventFinder-*.jar
+
+  result:
+    name: Smoke test result
+    runs-on: ubuntu-latest
+    needs: [smoke-test]
+    if: always()
+
+    steps:
+      - name: Check smoke test result
+        run: test "${{ needs.smoke-test.result }}" = "success"
