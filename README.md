@@ -23,6 +23,7 @@ Download the jar file from [Releases](https://github.com/book000/EventFinder/rel
 - It is highly recommended for use in flat worlds.
 - Some of the events are disabled from the beginning because they are displayed in large numbers.
 - Deprecated events are indicated by a strike-through line.
+- A single jar supports every Paper version from 1.16.5 to the latest. Events are detected from the running server.
 - The methods of the class show the return value of methods starting with `get` or `is`. Except when it contains `Handler`.
 
 ## Thanks

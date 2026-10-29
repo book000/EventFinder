@@ -6,3 +6,4 @@ commands:
   event:
     description: Change the conditions for showing / hiding events
     default: op
+api-version: 1.16
