@@ -6,10 +6,19 @@ set -euo pipefail
 version=$1
 plugin_jar=$(realpath "$2")
 work=$(mktemp -d)
-trap 'rm -rf "$work"' EXIT
+server=
+cleanup() {
+    if [ -n "$server" ] && kill -0 "$server" 2>/dev/null; then
+        kill "$server" 2>/dev/null || true
+        wait "$server" 2>/dev/null || true
+    fi
+    rm -rf "$work"
+}
+trap cleanup EXIT
 cd "$work"
 
-build=$(curl -fsS "https://fill.papermc.io/v3/projects/paper/versions/${version}/builds/latest")
+build=$(curl -fsS "https://fill.papermc.io/v3/projects/paper/versions/${version}/builds" | jq 'map(select(.channel == "STABLE")) | first')
+[ "$build" != "null" ] || { echo "No STABLE build for Paper ${version}"; exit 1; }
 url=$(jq -r '.downloads["server:default"].url' <<<"$build")
 sha256=$(jq -r '.downloads["server:default"].checksums.sha256' <<<"$build")
 curl -fsS -o paper.jar "$url"

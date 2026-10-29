@@ -27,6 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
+import java.security.CodeSource;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -89,7 +90,11 @@ public final class Main extends JavaPlugin {
      */
     private Set<Class<? extends Event>> scanEventClasses() {
         Set<Class<? extends Event>> result = new HashSet<>();
-        try (JarFile jar = new JarFile(new File(Event.class.getProtectionDomain().getCodeSource().getLocation().toURI()))) {
+        CodeSource codeSource = Event.class.getProtectionDomain().getCodeSource();
+        if (codeSource == null) {
+            throw new IllegalStateException("Failed to scan event classes: Event has no code source");
+        }
+        try (JarFile jar = new JarFile(new File(codeSource.getLocation().toURI()))) {
             for (Enumeration<JarEntry> entries = jar.entries(); entries.hasMoreElements(); ) {
                 String name = entries.nextElement().getName();
                 if (!name.endsWith(".class") || Arrays.stream(EVENT_PACKAGES).noneMatch(name::startsWith)) {
@@ -104,8 +109,8 @@ public final class Main extends JavaPlugin {
                     // イベントでないクラスが未提供の依存を参照している場合
                 }
             }
-        } catch (IOException | URISyntaxException e) {
-            throw new IllegalStateException("Failed to scan event classes", e);
+        } catch (IOException | URISyntaxException | IllegalArgumentException e) {
+            throw new IllegalStateException("Failed to scan event classes from " + codeSource.getLocation(), e);
         }
         return result;
     }
