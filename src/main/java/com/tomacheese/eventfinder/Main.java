@@ -6,7 +6,6 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -17,14 +16,21 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.reflections.Reflections;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.net.URISyntaxException;
+import java.security.CodeSource;
 import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 public final class Main extends JavaPlugin {
@@ -45,15 +51,83 @@ public final class Main extends JavaPlugin {
         registerEvents();
     }
 
+    private static final String[] EVENT_PACKAGES = {"org/bukkit/event/", "io/papermc/paper/", "com/destroystokyo/paper/", "org/spigotmc/event/"};
+
+    /**
+     * サーバーが提供する全イベントクラスを検出し、具象クラスごとにリスナーを登録する。
+     * 親子関係にあるイベントが重複して表示されないよう、実際のクラスが一致した場合のみ表示する。
+     */
     void registerEvents() {
-        Reflections reflections = new Reflections("com.tomacheese.eventfinder.listeners");
-        reflections.getSubTypesOf(Listener.class).forEach(clazz -> {
-            try {
-                getServer().getPluginManager().registerEvents(clazz.newInstance(), this);
-            } catch (IllegalPluginAccessException | InstantiationException | IllegalAccessException e) {
-                getLogger().warning("Register failed: " + clazz.getSimpleName());
+        int failed = 0;
+        Listener listener = new Listener() {};
+        for (Class<? extends Event> clazz : scanEventClasses()) {
+            if (Modifier.isAbstract(clazz.getModifiers())) {
+                continue;
             }
-        });
+            try {
+                getServer().getPluginManager().registerEvent(clazz, listener, EventPriority.NORMAL,
+                    (l, event) -> {
+                        if (event.getClass() == clazz) {
+                            showEvent(event);
+                        }
+                    }, this);
+            } catch (IllegalPluginAccessException e) {
+                failed++;
+                getLogger().warning("Register failed: " + clazz.getName());
+            }
+        }
+        if (failed > 0) {
+            getLogger().warning("Failed to register " + failed + " events.");
+        }
+    }
+
+    /**
+     * Event クラスを含む API の jar を走査し、Event のサブクラスを列挙する。
+     * 走査対象は Bukkit / Paper / Spigot のイベントパッケージに限定する。
+     * サーバーに含まれない依存を参照するクラスは読み込めないため、無視する (イベントとしても発火しない)。
+     *
+     * @return Event のサブクラス (抽象クラスを含む)
+     */
+    private Set<Class<? extends Event>> scanEventClasses() {
+        Set<Class<? extends Event>> result = new HashSet<>();
+        CodeSource codeSource = Event.class.getProtectionDomain().getCodeSource();
+        if (codeSource == null) {
+            throw new IllegalStateException("Failed to scan event classes: Event has no code source");
+        }
+        try (JarFile jar = new JarFile(new File(codeSource.getLocation().toURI()))) {
+            for (Enumeration<JarEntry> entries = jar.entries(); entries.hasMoreElements(); ) {
+                String name = entries.nextElement().getName();
+                if (!name.endsWith(".class") || Arrays.stream(EVENT_PACKAGES).noneMatch(name::startsWith)) {
+                    continue;
+                }
+                try {
+                    Class<?> clazz = Class.forName(name.substring(0, name.length() - ".class".length()).replace('/', '.'), false, getClassLoader());
+                    if (Event.class.isAssignableFrom(clazz) && clazz != Event.class) {
+                        result.add(clazz.asSubclass(Event.class));
+                    }
+                } catch (ClassNotFoundException | LinkageError ignored) {
+                    // イベントでないクラスが未提供の依存を参照している場合
+                }
+            }
+        } catch (IOException | URISyntaxException | IllegalArgumentException e) {
+            throw new IllegalStateException("Failed to scan event classes from " + codeSource.getLocation(), e);
+        }
+        return result;
+    }
+
+    /**
+     * コンポーネントのテキスト部分のみを連結して返す。
+     *
+     * @param component 対象のコンポーネント
+     * @return 装飾を含まない文字列
+     */
+    public static String plainText(Component component) {
+        StringBuilder sb = new StringBuilder();
+        if (component instanceof TextComponent) {
+            sb.append(((TextComponent) component).content());
+        }
+        component.children().forEach(c -> sb.append(plainText(c)));
+        return sb.toString();
     }
 
     public static void showEvent(Event event) {
@@ -122,7 +196,7 @@ public final class Main extends JavaPlugin {
         if (event instanceof Cancellable && ((Cancellable) event).isCancelled()) {
             builder.decorate(TextDecoration.STRIKETHROUGH);
         }
-        if (filter != null && !PlainComponentSerializer.plain().serialize(builder.build()).contains(filter)) {
+        if (filter != null && !plainText(builder.build()).contains(filter)) {
             return;
         }
         Bukkit.getServer().sendMessage(builder.build());

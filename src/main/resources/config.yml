@@ -34,3 +34,9 @@ hidePattern:
 - playerchunkunloadevent
 - entityexhaustionevent
 - chunkunloadevent
+- precreaturespawnevent
+- slimewanderevent
+- slimechangedirectionevent
+- genericgameevent
+- entitiesloadevent
+- entitiesunloadevent
