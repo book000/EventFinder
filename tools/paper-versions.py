@@ -1,12 +1,8 @@
-"""Paper の安定版一覧から、スモークテスト用の GitHub Actions マトリクス (JSON) を出力する。
-
-使い方: python tools/paper-versions.py <first|all>
-  first: 最古 (1.16.5) と、STABLE ビルドを持つ最新バージョンのみ
-  all:   1.16.5 以降の、STABLE ビルドを持つ全バージョン
-"""
+"""1.16.5 以降で STABLE ビルドを持つ全 Paper バージョンから、スモークテスト用の GitHub Actions マトリクス (JSON) を出力する。"""
 import json
 import re
-import sys
+import time
+import urllib.error
 import urllib.request
 
 OLDEST = (1, 16, 5)
@@ -31,8 +27,14 @@ def java_version(version):
 
 
 def fetch(path):
-    with urllib.request.urlopen("https://fill.papermc.io/v3/projects/paper" + path, timeout=30) as res:
-        return json.load(res)
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen("https://fill.papermc.io/v3/projects/paper" + path, timeout=30) as res:
+                return json.load(res)
+        except (urllib.error.URLError, TimeoutError):
+            if attempt == 2:
+                raise
+            time.sleep(5)
 
 
 def has_stable_build(version):
@@ -40,7 +42,6 @@ def has_stable_build(version):
 
 
 def main():
-    mode = sys.argv[1]
     groups = fetch("")["versions"]
 
     stable = sorted(
@@ -50,12 +51,8 @@ def main():
     if not stable:
         raise SystemExit("No Paper versions found")
 
-    if mode == "first":
-        latest = next((v for v in reversed(stable) if has_stable_build(v)), None)
-        targets = [stable[0], latest]
-    else:
-        targets = [v for v in stable if has_stable_build(v)]
-    print(json.dumps({"include": [{"version": v, "java": java_version(v)} for v in dict.fromkeys(targets)]}))
+    targets = [v for v in stable if has_stable_build(v)]
+    print(json.dumps({"include": [{"version": v, "java": java_version(v)} for v in targets]}))
 
 
 main()
