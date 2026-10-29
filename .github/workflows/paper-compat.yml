@@ -15,6 +15,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   plan:
     name: Plan
@@ -35,9 +39,7 @@ jobs:
       - name: Create matrix
         id: matrix
         run: |
-          MODE=all
-          if [ "${{ github.event_name }}" = "pull_request" ]; then MODE=first; fi
-          MATRIX=$(python tools/paper-versions.py $MODE)
+          MATRIX=$(python tools/paper-versions.py)
           echo "value=${MATRIX}" | tee -a $GITHUB_OUTPUT
 
   build:
