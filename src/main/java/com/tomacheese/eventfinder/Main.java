@@ -54,8 +54,8 @@ public final class Main extends JavaPlugin {
     private static final String[] EVENT_PACKAGES = {"org/bukkit/event/", "io/papermc/paper/", "com/destroystokyo/paper/", "org/spigotmc/event/"};
 
     /**
-     * サーバーが提供する全イベントクラスを検出し、具象クラスごとにリスナーを登録する。
-     * 親子関係にあるイベントが重複して表示されないよう、実際のクラスが一致した場合のみ表示する。
+     * Discovers every event class provided by the server and registers a listener for each concrete class.
+     * An event is shown only when its runtime class matches the registered class exactly, so that parent and child events are not displayed twice.
      */
     void registerEvents() {
         int failed = 0;
@@ -82,11 +82,11 @@ public final class Main extends JavaPlugin {
     }
 
     /**
-     * Event クラスを含む API の jar を走査し、Event のサブクラスを列挙する。
-     * 走査対象は Bukkit / Paper / Spigot のイベントパッケージに限定する。
-     * サーバーに含まれない依存を参照するクラスは読み込めないため、無視する (イベントとしても発火しない)。
+     * Scans the API jar that contains the {@link Event} class and lists its subclasses.
+     * Only the Bukkit / Paper / Spigot event packages ({@code EVENT_PACKAGES}) are scanned.
+     * Classes that reference dependencies missing from the server cannot be loaded and are skipped (such events are never fired either).
      *
-     * @return Event のサブクラス (抽象クラスを含む)
+     * @return subclasses of {@link Event}, including abstract classes
      */
     private Set<Class<? extends Event>> scanEventClasses() {
         Set<Class<? extends Event>> result = new HashSet<>();
@@ -106,7 +106,7 @@ public final class Main extends JavaPlugin {
                         result.add(clazz.asSubclass(Event.class));
                     }
                 } catch (ClassNotFoundException | LinkageError ignored) {
-                    // イベントでないクラスが未提供の依存を参照している場合
+                    // A non-event class references a dependency the server does not provide
                 }
             }
         } catch (IOException | URISyntaxException | IllegalArgumentException e) {
@@ -116,10 +116,10 @@ public final class Main extends JavaPlugin {
     }
 
     /**
-     * コンポーネントのテキスト部分のみを連結して返す。
+     * Concatenates only the text content of a component and its children.
      *
-     * @param component 対象のコンポーネント
-     * @return 装飾を含まない文字列
+     * @param component the component to convert
+     * @return the text without any styling
      */
     public static String plainText(Component component) {
         StringBuilder sb = new StringBuilder();
@@ -381,7 +381,6 @@ public final class Main extends JavaPlugin {
     public void loadHidePattern() {
         hidePattern.clear();
 
-        // 設定ファイルから一覧を読み込む
         List<?> list = conf.getList(CONF_HIDE_PATTERN);
 
         if (list == null) {
@@ -394,10 +393,8 @@ public final class Main extends JavaPlugin {
     }
 
     private void initPackageColor() {
-        // マップを初期化
         pkgColor.clear();
 
-        // 設定ファイルのエントリを順に処理
         Map<?, ?> map = conf.getMapList("color").get(0);
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             if (getNamedTextColor(entry.getValue().toString()) == null) {
@@ -409,10 +406,9 @@ public final class Main extends JavaPlugin {
     }
 
     boolean addHidePattern(String pattern) {
-        // 小文字にする
+        // Patterns are compared against the lowercased event name
         pattern = pattern.toLowerCase();
 
-        // 重複は無視
         if (hidePattern.contains(pattern)) {
             return false;
         }
@@ -422,7 +418,6 @@ public final class Main extends JavaPlugin {
     }
 
     boolean removeHidePattern(String pattern) {
-        // 小文字にする
         pattern = pattern.toLowerCase();
 
         hidePattern.remove(pattern);

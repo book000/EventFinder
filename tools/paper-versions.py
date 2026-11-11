@@ -1,4 +1,4 @@
-"""1.16.5 以降で STABLE ビルドを持つ全 Paper バージョンから、スモークテスト用の GitHub Actions マトリクス (JSON) を出力する。"""
+"""Prints a GitHub Actions matrix (JSON) for the smoke test: every Paper version since 1.16.5 that has a STABLE build."""
 import json
 import re
 import time
