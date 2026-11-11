@@ -1,6 +1,6 @@
 #!/bin/bash
-# 指定バージョンの Paper を起動し、EventFinder が有効化されてイベントを表示することを確認する。
-# 使い方: [JAVA=<java コマンド>] tools/smoke-test.sh <Paper version> <EventFinder jar>
+# Starts the given Paper version and checks that EventFinder is enabled and displays events.
+# Usage: [JAVA=<java command>] tools/smoke-test.sh <Paper version> <EventFinder jar>
 set -euo pipefail
 
 version=$1

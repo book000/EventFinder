@@ -23,7 +23,7 @@ if not exist run\mcrconapi-1.1.1.jar (
 )
 
 if not exist run\server.properties (
-    echo server.propertiesが存在しないため作成します。
+    echo server.properties does not exist, creating it.
     echo gamemode=creative> run/server.properties
     echo enforce-whitelist=true>> run/server.properties
     echo difficulty=peaceful>> run/server.properties
@@ -37,27 +37,27 @@ if not exist run\server.properties (
     echo motd=%PLUGIN_NAME% Test Server>> run/server.properties
 )
 
-echo jarファイルをコピーします。
+echo Copying the jar file.
 copy target\%JAR_FILE% run\plugins\%JAR_FILE%
 if not %errorlevel% == 0 (
     echo %JAR_FILE% NOT FOUND
 
-    echo 5秒後にクローズします。
+    echo Closing in 5 seconds.
     timeout 5 /NOBREAK
     exit 1
 )
 
-echo Minecraftサーバに対してリロードコマンドを実行します。
+echo Sending the reload command to the Minecraft server.
 java -jar run\mcrconapi-1.1.1.jar -a localhost -l rconpassword -n -c "rl confirm"
 
 if not %errorlevel% == 0 (
-    echo Minecraftサーバが起動していないため、起動します。
+    echo The Minecraft server is not running, starting it.
 
     cd run
     java -jar paper.jar -nogui
     if %errorlevel% == 0 exit
 )
 
-echo 5秒後にクローズします。
+echo Closing in 5 seconds.
 timeout 5 /NOBREAK
 exit

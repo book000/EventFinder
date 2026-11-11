@@ -1,5 +1,5 @@
-# 各 Paper バージョンでプラグインを起動し、動作を確認する
-# 新しい Paper が出たときに互換性の破壊を検知するため、定期実行する
+# Start the plugin on each Paper version and check that it works.
+# Runs on a schedule to detect compatibility breakage when a new Paper is released.
 
 name: Paper Compatibility
 
