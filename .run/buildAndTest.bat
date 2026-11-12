@@ -15,7 +15,8 @@ if not exist run\plugins (
 )
 
 if not exist run\paper.jar (
-    curl -o run\paper.jar -L "https://papermc.io/api/v1/paper/1.16.5/latest/download"
+    rem Paper 1.16.5 is EOL, so the final build (794) is pinned.
+    curl -fo run\paper.jar -L "https://fill-data.papermc.io/v1/objects/e67da4851d08cde378ab2b89be58849238c303351ed2482181a99c2c2b489276/paper-1.16.5-794.jar"
 )
 
 if not exist run\mcrconapi-1.1.1.jar (
