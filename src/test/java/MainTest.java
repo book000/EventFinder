@@ -35,13 +35,13 @@ public class MainTest {
                 }
                 lang.add(resource.substring(0, resource.length() - 4));
             }
-            List<String> missed = lang.stream()
+            List<String> invalid = lang.stream()
                 .filter(l -> Arrays.stream(Locale.getAvailableLocales())
-                    .anyMatch(locale -> locale.toString().equals(l)))
+                    .noneMatch(locale -> locale.toLanguageTag().equals(l)))
                 .collect(Collectors.toList());
 
-            if (!missed.isEmpty()) {
-                fail(String.format("The following language files have incorrect language names: %s", String.join(", ", missed)));
+            if (!invalid.isEmpty()) {
+                fail(String.format("The following language files have incorrect language names: %s", String.join(", ", invalid)));
             }
         } catch (IOException e) {
             fail(String.format("Failed to read the language file: %s %s", e.getClass().getSimpleName(), e.getMessage()));
