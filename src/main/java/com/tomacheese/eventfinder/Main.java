@@ -420,8 +420,7 @@ public final class Main extends JavaPlugin {
     boolean removeHidePattern(String pattern) {
         pattern = pattern.toLowerCase();
 
-        hidePattern.remove(pattern);
-        return true;
+        return hidePattern.remove(pattern);
     }
 
     public void setFilter(String filter) {
