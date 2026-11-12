@@ -171,7 +171,7 @@ public final class Main extends JavaPlugin {
             builder.append(Component.text("<" + event.getEventName() + ">", NamedTextColor.WHITE));
         }
 
-        if (Arrays.stream(event.getClass().getDeclaredFields()).map(field -> field.getAnnotation(Deprecated.class)).anyMatch(Objects::nonNull)) {
+        if (event.getClass().isAnnotationPresent(Deprecated.class)) {
             builder.append(Component.text("*", NamedTextColor.DARK_GRAY));
         }
 
