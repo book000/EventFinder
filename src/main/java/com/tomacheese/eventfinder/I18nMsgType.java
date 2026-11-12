@@ -12,7 +12,8 @@ public enum I18nMsgType {
     TooManyArguments("There are too many arguments."),
     ResetFilter("The filtering settings have been reset."),
     SetFilter("Filtering is now configured: {0}"),
-    HidingConditionCount("There are {0} hidden conditions that have been set.");
+    HidingConditionCount("There are {0} hidden conditions that have been set."),
+    UnknownColorName("Unknown color name: {0}");
 
     String defaultMessage;
 

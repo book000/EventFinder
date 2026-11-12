@@ -398,7 +398,7 @@ public final class Main extends JavaPlugin {
         Map<?, ?> map = conf.getMapList("color").get(0);
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             if (getNamedTextColor(entry.getValue().toString()) == null) {
-                Bukkit.getServer().sendMessage(Component.text("不明な色名：" + entry.getValue().toString(), NamedTextColor.RED));
+                Bukkit.getServer().sendMessage(Component.text(Lib.getMessage(null, I18nMsgType.UnknownColorName, entry.getValue().toString()), NamedTextColor.RED));
                 return;
             }
             pkgColor.put(entry.getKey().toString(), getNamedTextColor(entry.getValue().toString()));
