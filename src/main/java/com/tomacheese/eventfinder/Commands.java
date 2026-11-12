@@ -65,16 +65,16 @@ public class Commands implements CommandExecutor {
             String pattern = args[1];
             main.addHidePattern(pattern);
             Lib.sendMessage(sender, I18nMsgType.AddSingleHide, NamedTextColor.GREEN, pattern);
-            return;
-        }
-        int count = 0;
-        for (int i = 1; i < args.length; i++) {
-            if (main.addHidePattern(args[i])) {
-                count++;
+        } else {
+            int count = 0;
+            for (int i = 1; i < args.length; i++) {
+                if (main.addHidePattern(args[i])) {
+                    count++;
+                }
             }
-        }
 
-        Lib.sendMessage(sender, I18nMsgType.AddMultipleHide, NamedTextColor.GREEN, count);
+            Lib.sendMessage(sender, I18nMsgType.AddMultipleHide, NamedTextColor.GREEN, count);
+        }
 
         main.conf.set(Main.CONF_HIDE_PATTERN, Main.hidePattern);
         main.saveConfig();
@@ -87,16 +87,16 @@ public class Commands implements CommandExecutor {
             String pattern = args[1];
             main.removeHidePattern(pattern);
             Lib.sendMessage(sender, I18nMsgType.RemoveSingleHide, NamedTextColor.GREEN, pattern);
-            return;
-        }
-        int count = 0;
-        for (int i = 1; i < args.length; i++) {
-            if (main.removeHidePattern(args[i])) {
-                count++;
+        } else {
+            int count = 0;
+            for (int i = 1; i < args.length; i++) {
+                if (main.removeHidePattern(args[i])) {
+                    count++;
+                }
             }
-        }
 
-        Lib.sendMessage(sender, I18nMsgType.RemoveMultipleHide, NamedTextColor.GREEN, count);
+            Lib.sendMessage(sender, I18nMsgType.RemoveMultipleHide, NamedTextColor.GREEN, count);
+        }
 
         main.conf.set(Main.CONF_HIDE_PATTERN, Main.hidePattern);
         main.saveConfig();
