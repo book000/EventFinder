@@ -106,6 +106,7 @@ public class Commands implements CommandExecutor {
     void toggle(CommandSender sender, String[] args) {
         if (args.length != 2) {
             Lib.sendMessage(sender, I18nMsgType.TooManyArguments, NamedTextColor.RED);
+            return;
         }
         if (Main.hidePattern.contains(args[1].toLowerCase())) {
             main.removeHidePattern(args[1]);
