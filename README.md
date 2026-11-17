@@ -22,7 +22,7 @@ The `/event` command requires the `eventfinder.command.event` permission, which 
 - `/event save`: Saves the hide conditions to `plugins/EventFinder/config.yml`.
 - `/event load`: Loads the hide conditions from `plugins/EventFinder/config.yml`.
 
-A hide condition matches every event whose name starts with the pattern, case-insensitively. `/event add` and `/event remove` with a single pattern change the conditions in memory only, so run `/event save` to keep them across restarts. With several patterns, and with `/event toggle`, the conditions are saved immediately.
+A hide condition matches every event whose name starts with the pattern, case-insensitively. Changes made with `/event add`, `/event remove`, and `/event toggle` are saved immediately. `/event load` reads the current file from disk, including edits made while the server is running.
 
 ## Specifications
 

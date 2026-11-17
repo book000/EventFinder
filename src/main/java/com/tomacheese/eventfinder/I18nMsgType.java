@@ -4,6 +4,7 @@ public enum I18nMsgType {
     CommandArgumentRequired("Requires arguments. The argument can be one of the following: {0}"),
     CommandArgumentIncorrect("Incorrect arguments. The argument can be one of the following: {0}"),
     LoadedHideConfig("The hide settings have been loaded."),
+    FailedLoadHideConfig("Could not load the hide settings. Check the server log."),
     AddSingleHide("Added {0} to the hide condition."),
     AddMultipleHide("Added {0} hiding conditions."),
     SaveHideConfig("The hide settings have been saved."),

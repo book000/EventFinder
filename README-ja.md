@@ -22,7 +22,7 @@ EventFinder は、サーバーで発生したイベントをチャット欄に�
 - `/event save`: 非表示条件を `plugins/EventFinder/config.yml` に保存します。
 - `/event load`: 非表示条件を `plugins/EventFinder/config.yml` から読み込みます。
 
-非表示条件は、イベント名が (大文字小文字を区別せず) パターンで始まるすべてのイベントに一致します。パターンを 1 つだけ指定した `/event add` と `/event remove` は、メモリ上の条件だけを変更します。再起動後も保持するには `/event save` を実行してください。複数のパターンを指定した場合と `/event toggle` では、条件がすぐに保存されます。
+非表示条件は、イベント名が (大文字小文字を区別せず) パターンで始まるすべてのイベントに一致します。`/event add`、`/event remove`、`/event toggle` による変更はすぐに保存されます。`/event load` は、サーバーの稼働中に加えられた編集を含む現在のファイルをディスクから読み込みます。
 
 ## Specifications
 
