@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -76,7 +77,7 @@ public class Commands implements CommandExecutor {
             Lib.sendMessage(sender, I18nMsgType.AddMultipleHide, NamedTextColor.GREEN, count);
         }
 
-        main.conf.set(Main.CONF_HIDE_PATTERN, Main.hidePattern);
+        main.conf.set(Main.CONF_HIDE_PATTERN, Main.getHidePatterns());
         main.saveConfig();
         Lib.sendMessage(sender, I18nMsgType.SaveHideConfig, NamedTextColor.GREEN);
     }
@@ -98,7 +99,7 @@ public class Commands implements CommandExecutor {
             Lib.sendMessage(sender, I18nMsgType.RemoveMultipleHide, NamedTextColor.GREEN, count);
         }
 
-        main.conf.set(Main.CONF_HIDE_PATTERN, Main.hidePattern);
+        main.conf.set(Main.CONF_HIDE_PATTERN, Main.getHidePatterns());
         main.saveConfig();
         Lib.sendMessage(sender, I18nMsgType.SaveHideConfig, NamedTextColor.GREEN);
     }
@@ -108,7 +109,7 @@ public class Commands implements CommandExecutor {
             Lib.sendMessage(sender, I18nMsgType.TooManyArguments, NamedTextColor.RED);
             return;
         }
-        if (Main.hidePattern.contains(args[1].toLowerCase())) {
+        if (Main.getHidePatterns().contains(args[1].toLowerCase())) {
             main.removeHidePattern(args[1]);
             Lib.sendMessage(sender, I18nMsgType.RemoveSingleHide, NamedTextColor.GREEN, args[1]);
         } else {
@@ -116,7 +117,7 @@ public class Commands implements CommandExecutor {
             Lib.sendMessage(sender, I18nMsgType.AddSingleHide, NamedTextColor.GREEN, args[1]);
         }
 
-        main.conf.set(Main.CONF_HIDE_PATTERN, Main.hidePattern);
+        main.conf.set(Main.CONF_HIDE_PATTERN, Main.getHidePatterns());
         main.saveConfig();
         Lib.sendMessage(sender, I18nMsgType.SaveHideConfig, NamedTextColor.GREEN);
     }
@@ -132,14 +133,15 @@ public class Commands implements CommandExecutor {
     }
 
     void list(CommandSender sender, String[] args) {
-        Lib.sendMessage(sender, I18nMsgType.HidingConditionCount, NamedTextColor.GREEN, Main.hidePattern.size());
-        for (String pattern : Main.hidePattern) {
+        List<String> patterns = Main.getHidePatterns();
+        Lib.sendMessage(sender, I18nMsgType.HidingConditionCount, NamedTextColor.GREEN, patterns.size());
+        for (String pattern : patterns) {
             sender.sendMessage(pattern);
         }
     }
 
     void save(CommandSender sender, String[] args) {
-        main.conf.set(Main.CONF_HIDE_PATTERN, Main.hidePattern);
+        main.conf.set(Main.CONF_HIDE_PATTERN, Main.getHidePatterns());
         main.saveConfig();
         Lib.sendMessage(sender, I18nMsgType.SaveHideConfig, NamedTextColor.GREEN);
     }

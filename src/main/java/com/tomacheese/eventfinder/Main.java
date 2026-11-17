@@ -36,9 +36,9 @@ import java.util.stream.Collectors;
 public final class Main extends JavaPlugin {
     public static final String CONF_HIDE_PATTERN = "hidePattern";
     private static final Map<String, NamedTextColor> pkgColor = new HashMap<>();
-    public static final List<String> hidePattern = new ArrayList<>();
+    private static volatile List<String> hidePattern = Collections.emptyList();
     public FileConfiguration conf;
-    private static String filter = null;
+    private static volatile String filter = null;
 
     public void onEnable() {
         saveDefaultConfig();
@@ -148,6 +148,8 @@ public final class Main extends JavaPlugin {
     }
 
     static Component formatEvent(Event event, boolean fullDetails) {
+        List<String> patterns = hidePattern;
+        String currentFilter = filter;
         Class<?> handler = event.getClass();
         Map<String, Object> details = new HashMap<>();
         Method[] methods = event.getClass().getMethods();
@@ -205,7 +207,7 @@ public final class Main extends JavaPlugin {
         builder.append(methodsComponent.colorIfAbsent(NamedTextColor.GRAY).build());
 
         String eventName = event.getEventName().toLowerCase();
-        boolean isHide = hidePattern.stream().anyMatch(eventName::startsWith);
+        boolean isHide = patterns.stream().anyMatch(eventName::startsWith);
         if (isHide) {
             return null;
         }
@@ -213,7 +215,7 @@ public final class Main extends JavaPlugin {
         if (event instanceof Cancellable && ((Cancellable) event).isCancelled()) {
             builder.decorate(TextDecoration.STRIKETHROUGH);
         }
-        if (filter != null && !plainText(builder.build()).contains(filter)) {
+        if (currentFilter != null && !plainText(builder.build()).contains(currentFilter)) {
             return null;
         }
         return builder.build();
@@ -395,17 +397,28 @@ public final class Main extends JavaPlugin {
         }
     }
 
+    /**
+     * Returns the current immutable snapshot of the hide patterns.
+     *
+     * @return normalized hide patterns in insertion order
+     */
+    public static List<String> getHidePatterns() {
+        return hidePattern;
+    }
+
+    /**
+     * Replaces the hide patterns with a complete snapshot of the configured patterns.
+     */
     public void loadHidePattern() {
-        hidePattern.clear();
-
-        List<?> list = conf.getList(CONF_HIDE_PATTERN);
-
-        if (list == null) {
-            return;
-        }
-
-        for (Object pattern : list) {
-            addHidePattern(pattern.toString());
+        synchronized (Main.class) {
+            List<?> configured = conf.getList(CONF_HIDE_PATTERN);
+            Set<String> patterns = new LinkedHashSet<>();
+            if (configured != null) {
+                for (Object pattern : configured) {
+                    patterns.add(pattern.toString().toLowerCase());
+                }
+            }
+            hidePattern = Collections.unmodifiableList(new ArrayList<>(patterns));
         }
     }
 
@@ -423,21 +436,28 @@ public final class Main extends JavaPlugin {
     }
 
     boolean addHidePattern(String pattern) {
-        // Patterns are compared against the lowercased event name
         pattern = pattern.toLowerCase();
-
-        if (hidePattern.contains(pattern)) {
-            return false;
+        synchronized (Main.class) {
+            if (hidePattern.contains(pattern)) {
+                return false;
+            }
+            List<String> patterns = new ArrayList<>(hidePattern);
+            patterns.add(pattern);
+            hidePattern = Collections.unmodifiableList(patterns);
+            return true;
         }
-
-        hidePattern.add(pattern);
-        return true;
     }
 
     boolean removeHidePattern(String pattern) {
         pattern = pattern.toLowerCase();
-
-        return hidePattern.remove(pattern);
+        synchronized (Main.class) {
+            List<String> patterns = new ArrayList<>(hidePattern);
+            if (!patterns.remove(pattern)) {
+                return false;
+            }
+            hidePattern = Collections.unmodifiableList(patterns);
+            return true;
+        }
     }
 
     public void setFilter(String filter) {
