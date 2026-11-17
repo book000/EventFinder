@@ -150,6 +150,12 @@ public final class Main extends JavaPlugin {
     static Component formatEvent(Event event, boolean fullDetails) {
         List<String> patterns = hidePattern;
         String currentFilter = filter;
+        String eventName = event.getEventName().toLowerCase();
+        boolean isHide = patterns.stream().anyMatch(eventName::startsWith);
+        if (isHide) {
+            return null;
+        }
+
         Class<?> handler = event.getClass();
         Map<String, Object> details = new HashMap<>();
         Method[] methods = event.getClass().getMethods();
@@ -214,12 +220,6 @@ public final class Main extends JavaPlugin {
                 .append((Component) s.getValue()))
             .forEach(c -> methodsComponent.append(c, Component.space()));
         builder.append(methodsComponent.colorIfAbsent(NamedTextColor.GRAY).build());
-
-        String eventName = event.getEventName().toLowerCase();
-        boolean isHide = patterns.stream().anyMatch(eventName::startsWith);
-        if (isHide) {
-            return null;
-        }
 
         if (event instanceof Cancellable && ((Cancellable) event).isCancelled()) {
             builder.decorate(TextDecoration.STRIKETHROUGH);

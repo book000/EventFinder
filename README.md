@@ -27,7 +27,7 @@ A hide condition matches every event whose name starts with the pattern, case-in
 ## Specifications
 
 - It is highly recommended to use it in a flat world.
-- Some events that occur in large numbers are hidden from the beginning (see `hidePattern` in `config.yml`).
+- Some events that occur in large numbers are hidden from the beginning (see `hidePattern` in `config.yml`). Hidden events are skipped before reflective detail access and message rendering, including in full-detail debug mode.
 - Each event uses a snapshot of the hide patterns and filter, so asynchronous events can be formatted safely while commands change these settings. Loading hide patterns replaces the entire list at once.
 - Event output is sent only to online players with the `eventfinder.view` permission (operators by default); the console receives only event class names, even in debug mode. By default, only event names and metadata are shown, and reflective field values are omitted. Hover over the event name to see the class and its methods.
 - Detailed output invokes only non-static, zero-argument getters; when getters share a name after removing `get` or `is`, a stable order chooses one, with `get` before `is`.
