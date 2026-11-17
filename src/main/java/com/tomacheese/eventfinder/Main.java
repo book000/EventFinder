@@ -151,23 +151,32 @@ public final class Main extends JavaPlugin {
         Class<?> handler = event.getClass();
         Map<String, Object> details = new HashMap<>();
         Method[] methods = event.getClass().getMethods();
-        for (Method method : fullDetails ? methods : new Method[0]) {
+        Method[] accessors = fullDetails ? methods.clone() : new Method[0];
+        Arrays.sort(accessors, Comparator.comparing(Method::getName)
+            .thenComparing(method -> method.getDeclaringClass().getName())
+            .thenComparing(method -> method.getReturnType().getName()));
+        Set<String> seenKeys = new HashSet<>();
+        for (Method method : accessors) {
             String methodName = method.getName();
             if (!methodName.startsWith("get") && !methodName.startsWith("is")) {
                 continue;
             }
-            if (methodName.contains("Handler")) {
+            if (methodName.contains("Handler") || Modifier.isStatic(method.getModifiers()) || method.getParameterCount() != 0) {
                 continue;
             }
 
             int cut = methodName.startsWith("get") ? 3 : methodName.startsWith("is") ? 2 : 0;
+            String key = methodName.substring(cut);
+            if (!seenKeys.add(key)) {
+                continue;
+            }
 
             try {
-                details.put(method.getName().substring(cut), method.invoke(event));
+                details.put(key, method.invoke(event));
             } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
-                details.put(method.getName().substring(cut), "?");
+                details.put(key, "?");
             } catch (NullPointerException e) {
-                details.put(method.getName().substring(cut), null);
+                details.put(key, null);
             }
         }
 
