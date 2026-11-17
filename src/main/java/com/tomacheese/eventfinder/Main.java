@@ -130,11 +130,27 @@ public final class Main extends JavaPlugin {
         return sb.toString();
     }
 
-    public static void showEvent(Event event) {
+    public void showEvent(Event event) {
+        Component message = formatEvent(event, conf.getBoolean("debug.fullEventDetails", false));
+        if (message == null) return;
+        if (event.isAsynchronous()) {
+            Bukkit.getScheduler().runTask(this, () -> sendEvent(message, Bukkit.getOnlinePlayers()));
+        } else {
+            sendEvent(message, Bukkit.getOnlinePlayers());
+        }
+    }
+
+    static void sendEvent(Component message, Iterable<? extends Player> players) {
+        for (Player player : players) {
+            if (player.hasPermission("eventfinder.view")) player.sendMessage(message);
+        }
+    }
+
+    static Component formatEvent(Event event, boolean fullDetails) {
         Class<?> handler = event.getClass();
         Map<String, Object> details = new HashMap<>();
         Method[] methods = event.getClass().getMethods();
-        for (Method method : methods) {
+        for (Method method : fullDetails ? methods : new Method[0]) {
             String methodName = method.getName();
             if (!methodName.startsWith("get") && !methodName.startsWith("is")) {
                 continue;
@@ -190,16 +206,16 @@ public final class Main extends JavaPlugin {
         String eventName = event.getEventName().toLowerCase();
         boolean isHide = hidePattern.stream().anyMatch(eventName::startsWith);
         if (isHide) {
-            return;
+            return null;
         }
 
         if (event instanceof Cancellable && ((Cancellable) event).isCancelled()) {
             builder.decorate(TextDecoration.STRIKETHROUGH);
         }
         if (filter != null && !plainText(builder.build()).contains(filter)) {
-            return;
+            return null;
         }
-        Bukkit.getServer().sendMessage(builder.build());
+        return builder.build();
     }
 
     static Component converter(Object obj) {

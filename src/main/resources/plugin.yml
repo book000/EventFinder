@@ -7,3 +7,7 @@ commands:
     description: Change the conditions for showing / hiding events
     default: op
 api-version: 1.16
+permissions:
+  eventfinder.view:
+    description: View event output
+    default: op
