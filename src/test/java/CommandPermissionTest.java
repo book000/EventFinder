@@ -17,6 +17,22 @@ import static org.junit.Assert.assertNotNull;
 
 public class CommandPermissionTest {
     @Test
+    public void commandAndViewPermissionsAreDeclaredForOperatorsByDefault() throws Exception {
+        try (InputStream input = getClass().getResourceAsStream("/plugin.yml")) {
+            assertNotNull(input);
+            Map<?, ?> yaml = new Yaml().load(input);
+            Map<?, ?> permissions = (Map<?, ?>) yaml.get("permissions");
+            assertNotNull(permissions);
+            for (String name : new String[]{"eventfinder.command.event", "eventfinder.view"}) {
+                Map<?, ?> permission = (Map<?, ?>) permissions.get(name);
+                assertNotNull("Missing permission: " + name, permission);
+                assertEquals(name, PermissionDefault.OP,
+                    PermissionDefault.getByName((String) permission.get("default")));
+            }
+        }
+    }
+
+    @Test
     public void eventMutationsRequirePermissionGrantedToOperatorsByDefault() throws Exception {
         PluginDescriptionFile description;
         try (InputStream input = getClass().getResourceAsStream("/plugin.yml")) {
