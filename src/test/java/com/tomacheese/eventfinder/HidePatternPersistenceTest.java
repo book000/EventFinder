@@ -43,7 +43,7 @@ public class HidePatternPersistenceTest {
         main.reloadConfig();
         main.conf = main.getConfig();
         main.loadHidePattern();
-        defaults = new ArrayList<>(Main.hidePattern);
+        defaults = new ArrayList<>(Main.getHidePatterns());
         commands = new Commands(main);
         sender = (CommandSender) Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[]{CommandSender.class},
             (proxy, method, args) -> null);
@@ -51,7 +51,8 @@ public class HidePatternPersistenceTest {
 
     @After
     public void tearDown() {
-        Main.hidePattern.clear();
+        main.conf = new YamlConfiguration();
+        main.loadHidePattern();
     }
 
     private void setPluginField(String name, Object value) throws Exception {
@@ -62,10 +63,10 @@ public class HidePatternPersistenceTest {
 
     private void roundTrip(String... command) {
         assertTrue(commands.onCommand(sender, null, "event", command));
-        List<String> expected = new ArrayList<>(Main.hidePattern);
-        assertNotSame(Main.hidePattern, main.conf.getList(Main.CONF_HIDE_PATTERN));
+        List<String> expected = new ArrayList<>(Main.getHidePatterns());
+        assertNotSame(Main.getHidePatterns(), main.conf.getList(Main.CONF_HIDE_PATTERN));
         commands.load(sender, new String[]{"load"});
-        assertEquals(expected, Main.hidePattern);
+        assertEquals(expected, Main.getHidePatterns());
         commands.save(sender, new String[]{"save"});
         assertEquals(expected, YamlConfiguration.loadConfiguration(configFile).getStringList(Main.CONF_HIDE_PATTERN));
     }
@@ -81,20 +82,20 @@ public class HidePatternPersistenceTest {
         roundTrip("toggle", "ExampleEvent");
         roundTrip("toggle", "ExampleEvent");
         roundTrip("save");
-        assertEquals(defaults, Main.hidePattern);
+        assertEquals(defaults, Main.getHidePatterns());
     }
 
     @Test
-    public void aliasedListIsSnapshottedBeforeClearing() {
-        main.conf.set(Main.CONF_HIDE_PATTERN, Main.hidePattern);
+    public void aliasedListIsPreservedDuringReplacement() {
+        main.conf.set(Main.CONF_HIDE_PATTERN, Main.getHidePatterns());
         main.loadHidePattern();
-        assertEquals(defaults, Main.hidePattern);
+        assertEquals(defaults, Main.getHidePatterns());
         main.conf.set(Main.CONF_HIDE_PATTERN, Arrays.asList("MixedCase", "mixedcase", "Other"));
         main.loadHidePattern();
-        assertEquals(Arrays.asList("mixedcase", "other"), Main.hidePattern);
+        assertEquals(Arrays.asList("mixedcase", "other"), Main.getHidePatterns());
         main.conf = new YamlConfiguration();
         main.loadHidePattern();
-        assertTrue(Main.hidePattern.isEmpty());
+        assertTrue(Main.getHidePatterns().isEmpty());
     }
 
     @Test
@@ -105,7 +106,7 @@ public class HidePatternPersistenceTest {
         edited.save(configFile);
         commands.load(sender, new String[]{"load"});
         assertSame(main.getConfig(), main.conf);
-        assertEquals(Arrays.asList("editedevent"), Main.hidePattern);
+        assertEquals(Arrays.asList("editedevent"), Main.getHidePatterns());
         commands.save(sender, new String[]{"save"});
         YamlConfiguration saved = YamlConfiguration.loadConfiguration(configFile);
         assertEquals(Arrays.asList("editedevent"), saved.getStringList(Main.CONF_HIDE_PATTERN));
@@ -117,8 +118,26 @@ public class HidePatternPersistenceTest {
         byte[] invalid = "hidePattern: [broken\n".getBytes(java.nio.charset.StandardCharsets.UTF_8);
         Files.write(configFile.toPath(), invalid);
         commands.load(sender, new String[]{"load"});
-        assertEquals(defaults, Main.hidePattern);
+        assertEquals(defaults, Main.getHidePatterns());
         assertArrayEquals(invalid, Files.readAllBytes(configFile.toPath()));
         assertEquals(defaults, main.conf.getStringList(Main.CONF_HIDE_PATTERN));
+    }
+
+    @Test
+    public void nullPatternLeavesActiveSettingsAndFileUntouched() throws Exception {
+        byte[] invalid = "hidePattern: [valid, null]\ndebug:\n  fullEventDetails: true\n".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        Files.write(configFile.toPath(), invalid);
+        commands.load(sender, new String[]{"load"});
+        assertEquals(defaults, Main.getHidePatterns());
+        assertArrayEquals(invalid, Files.readAllBytes(configFile.toPath()));
+        assertEquals(defaults, main.conf.getStringList(Main.CONF_HIDE_PATTERN));
+        assertFalse(main.conf.getBoolean("debug.fullEventDetails"));
+    }
+
+    @Test
+    public void nullPatternDoesNotClearActivePatternsWhenLoadingCachedConfig() {
+        main.conf.set(Main.CONF_HIDE_PATTERN, Arrays.asList("valid", null));
+        main.loadHidePattern();
+        assertEquals(defaults, Main.getHidePatterns());
     }
 }

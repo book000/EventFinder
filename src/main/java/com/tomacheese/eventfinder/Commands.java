@@ -63,6 +63,9 @@ public class Commands implements CommandExecutor {
         YamlConfiguration loaded = new YamlConfiguration();
         try {
             loaded.load(new File(main.getDataFolder(), "config.yml"));
+            if (loaded.getList(Main.CONF_HIDE_PATTERN) != null && loaded.getList(Main.CONF_HIDE_PATTERN).contains(null)) {
+                throw new InvalidConfigurationException("hidePattern contains a null entry");
+            }
             main.getConfig().loadFromString(loaded.saveToString());
             main.conf = main.getConfig();
         } catch (IOException | InvalidConfigurationException e) {
@@ -92,7 +95,7 @@ public class Commands implements CommandExecutor {
             Lib.sendMessage(sender, I18nMsgType.AddMultipleHide, NamedTextColor.GREEN, count);
         }
 
-        main.conf.set(Main.CONF_HIDE_PATTERN, Main.getHidePatterns());
+        main.conf.set(Main.CONF_HIDE_PATTERN, new ArrayList<>(Main.getHidePatterns()));
         main.saveConfig();
         Lib.sendMessage(sender, I18nMsgType.SaveHideConfig, NamedTextColor.GREEN);
     }
@@ -114,7 +117,7 @@ public class Commands implements CommandExecutor {
             Lib.sendMessage(sender, I18nMsgType.RemoveMultipleHide, NamedTextColor.GREEN, count);
         }
 
-        main.conf.set(Main.CONF_HIDE_PATTERN, Main.getHidePatterns());
+        main.conf.set(Main.CONF_HIDE_PATTERN, new ArrayList<>(Main.getHidePatterns()));
         main.saveConfig();
         Lib.sendMessage(sender, I18nMsgType.SaveHideConfig, NamedTextColor.GREEN);
     }
@@ -132,7 +135,7 @@ public class Commands implements CommandExecutor {
             Lib.sendMessage(sender, I18nMsgType.AddSingleHide, NamedTextColor.GREEN, args[1]);
         }
 
-        main.conf.set(Main.CONF_HIDE_PATTERN, Main.getHidePatterns());
+        main.conf.set(Main.CONF_HIDE_PATTERN, new ArrayList<>(Main.getHidePatterns()));
         main.saveConfig();
         Lib.sendMessage(sender, I18nMsgType.SaveHideConfig, NamedTextColor.GREEN);
     }
@@ -156,7 +159,7 @@ public class Commands implements CommandExecutor {
     }
 
     void save(CommandSender sender, String[] args) {
-        main.conf.set(Main.CONF_HIDE_PATTERN, Main.getHidePatterns());
+        main.conf.set(Main.CONF_HIDE_PATTERN, new ArrayList<>(Main.getHidePatterns()));
         main.saveConfig();
         Lib.sendMessage(sender, I18nMsgType.SaveHideConfig, NamedTextColor.GREEN);
     }
