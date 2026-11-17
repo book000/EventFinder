@@ -12,7 +12,7 @@ EventFinder は、サーバーで発生したイベントをチャット欄に�
 
 ## Commands
 
-`/event` コマンドは、デフォルトではオペレーターが使用できます。
+`/event` コマンドには `eventfinder.command.event` 権限が必要です。この権限はデフォルトでオペレーターに付与されます。
 
 - `/event <add|hide> <EventNamePattern>...`: 各 `EventNamePattern` を非表示条件に追加します。
 - `/event <del|remove|show> <EventNamePattern>...`: 各 `EventNamePattern` を非表示条件から削除します。
