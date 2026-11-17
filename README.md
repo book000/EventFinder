@@ -12,7 +12,7 @@ Download the jar file from [Releases](https://github.com/book000/EventFinder/rel
 
 ## Commands
 
-The `/event` command is available to operators by default.
+The `/event` command requires the `eventfinder.command.event` permission, which is granted to operators by default.
 
 - `/event <add|hide> <EventNamePattern>...`: Adds each `EventNamePattern` to the hide conditions.
 - `/event <del|remove|show> <EventNamePattern>...`: Removes each `EventNamePattern` from the hide conditions.

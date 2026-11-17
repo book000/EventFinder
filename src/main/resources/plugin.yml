@@ -5,5 +5,9 @@ author: mine_book000
 commands:
   event:
     description: Change the conditions for showing / hiding events
+    permission: eventfinder.command.event
+permissions:
+  eventfinder.command.event:
+    description: Allows use of the event command
     default: op
 api-version: 1.16
