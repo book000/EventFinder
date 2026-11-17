@@ -1,3 +1,5 @@
+debug:
+  fullEventDetails: false
 color:
 - org.bukkit.event.block: RED
   org.bukkit.event.enchantment: LIGHT_PURPLE

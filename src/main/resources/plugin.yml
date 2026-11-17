@@ -11,3 +11,7 @@ permissions:
     description: Allows use of the event command
     default: op
 api-version: 1.16
+permissions:
+  eventfinder.view:
+    description: View event output
+    default: op
