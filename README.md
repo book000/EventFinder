@@ -30,6 +30,7 @@ A hide condition matches every event whose name starts with the pattern, case-in
 - Some events that occur in large numbers are hidden from the beginning (see `hidePattern` in `config.yml`).
 - Each event uses a snapshot of the hide patterns and filter, so asynchronous events can be formatted safely while commands change these settings. Loading hide patterns replaces the entire list at once.
 - Event output is sent only to online players with the `eventfinder.view` permission (operators by default); the console receives only event class names, even in debug mode. By default, only event names and metadata are shown, and reflective field values are omitted. Hover over the event name to see the class and its methods.
+- Detailed output invokes only non-static, zero-argument getters; when getters share a name after removing `get` or `is`, a stable order chooses one, with `get` before `is`.
 - To enable full reflective dumps, set `debug.fullEventDetails: true` in `plugins/EventFinder/config.yml` and restart the server. This exposes arbitrary event data, including login addresses and private commands, to every player with `eventfinder.view`; grant that permission only to trusted users and enable this mode only in a trusted debugging environment. Existing configs without this setting remain in the safe default mode.
 - Cancelled events are shown with a strike-through, and the event name is followed by `*` when the event class declares a deprecated field.
 - The event class names are colored per package (see `color` in `config.yml`).
