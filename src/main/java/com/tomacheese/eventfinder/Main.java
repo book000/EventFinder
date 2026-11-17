@@ -421,6 +421,10 @@ public final class Main extends JavaPlugin {
     public void loadHidePattern() {
         synchronized (Main.class) {
             List<?> configured = conf.getList(CONF_HIDE_PATTERN);
+            if (configured != null && configured.contains(null)) {
+                getLogger().warning("Could not load hidePattern: list contains a null entry");
+                return;
+            }
             Set<String> patterns = new LinkedHashSet<>();
             if (configured != null) {
                 for (Object pattern : configured) {

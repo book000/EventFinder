@@ -4,9 +4,14 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +60,19 @@ public class Commands implements CommandExecutor {
     }
 
     void load(CommandSender sender, String[] args) {
+        YamlConfiguration loaded = new YamlConfiguration();
+        try {
+            loaded.load(new File(main.getDataFolder(), "config.yml"));
+            if (loaded.getList(Main.CONF_HIDE_PATTERN) != null && loaded.getList(Main.CONF_HIDE_PATTERN).contains(null)) {
+                throw new InvalidConfigurationException("hidePattern contains a null entry");
+            }
+            main.getConfig().loadFromString(loaded.saveToString());
+            main.conf = main.getConfig();
+        } catch (IOException | InvalidConfigurationException e) {
+            main.getLogger().warning("Could not load config.yml: " + e.getMessage());
+            Lib.sendMessage(sender, I18nMsgType.FailedLoadHideConfig, NamedTextColor.RED);
+            return;
+        }
         main.loadHidePattern();
         Lib.sendMessage(sender, I18nMsgType.LoadedHideConfig, NamedTextColor.GREEN);
         list(sender, args);
@@ -77,7 +95,7 @@ public class Commands implements CommandExecutor {
             Lib.sendMessage(sender, I18nMsgType.AddMultipleHide, NamedTextColor.GREEN, count);
         }
 
-        main.conf.set(Main.CONF_HIDE_PATTERN, Main.getHidePatterns());
+        main.conf.set(Main.CONF_HIDE_PATTERN, new ArrayList<>(Main.getHidePatterns()));
         main.saveConfig();
         Lib.sendMessage(sender, I18nMsgType.SaveHideConfig, NamedTextColor.GREEN);
     }
@@ -99,7 +117,7 @@ public class Commands implements CommandExecutor {
             Lib.sendMessage(sender, I18nMsgType.RemoveMultipleHide, NamedTextColor.GREEN, count);
         }
 
-        main.conf.set(Main.CONF_HIDE_PATTERN, Main.getHidePatterns());
+        main.conf.set(Main.CONF_HIDE_PATTERN, new ArrayList<>(Main.getHidePatterns()));
         main.saveConfig();
         Lib.sendMessage(sender, I18nMsgType.SaveHideConfig, NamedTextColor.GREEN);
     }
@@ -117,7 +135,7 @@ public class Commands implements CommandExecutor {
             Lib.sendMessage(sender, I18nMsgType.AddSingleHide, NamedTextColor.GREEN, args[1]);
         }
 
-        main.conf.set(Main.CONF_HIDE_PATTERN, Main.getHidePatterns());
+        main.conf.set(Main.CONF_HIDE_PATTERN, new ArrayList<>(Main.getHidePatterns()));
         main.saveConfig();
         Lib.sendMessage(sender, I18nMsgType.SaveHideConfig, NamedTextColor.GREEN);
     }
@@ -141,7 +159,7 @@ public class Commands implements CommandExecutor {
     }
 
     void save(CommandSender sender, String[] args) {
-        main.conf.set(Main.CONF_HIDE_PATTERN, Main.getHidePatterns());
+        main.conf.set(Main.CONF_HIDE_PATTERN, new ArrayList<>(Main.getHidePatterns()));
         main.saveConfig();
         Lib.sendMessage(sender, I18nMsgType.SaveHideConfig, NamedTextColor.GREEN);
     }

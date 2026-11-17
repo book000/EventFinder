@@ -1,6 +1,7 @@
 CommandArgumentRequired: "引数が足りません。引数は次のいずれかです: {0}"
 CommandArgumentIncorrect: "引数が不正です。引数は次のいずれかです: {0}"
 LoadedHideConfig: "非表示設定が読み込まれました。"
+FailedLoadHideConfig: "非表示設定を読み込めませんでした。サーバーログを確認してください。"
 AddSingleHide: "非表示条件に {0} を追加しました。"
 AddMultipleHide: "{0} 個の非表示条件を追加しました。"
 SaveHideConfig: "非表示設定が保存されました。"
