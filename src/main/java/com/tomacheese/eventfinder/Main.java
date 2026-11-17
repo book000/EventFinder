@@ -133,6 +133,7 @@ public final class Main extends JavaPlugin {
     public void showEvent(Event event) {
         Component message = formatEvent(event, conf.getBoolean("debug.fullEventDetails", false));
         if (message == null) return;
+        getLogger().info("Event: " + event.getClass().getSimpleName());
         if (event.isAsynchronous()) {
             Bukkit.getScheduler().runTask(this, () -> sendEvent(message, Bukkit.getOnlinePlayers()));
         } else {

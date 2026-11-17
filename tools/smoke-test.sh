@@ -50,7 +50,7 @@ sed -E 's/\x1b\[[0-9;]*m//g' log.txt > clean.txt
 errors='Could not pass event|Register failed|Failed to register|Error occurred while enabling EventFinder|Legacy plugin EventFinder'
 fail=0
 grep -q 'Enabling EventFinder' clean.txt || { echo "FAIL: plugin was not enabled"; fail=1; }
-grep -qE '^\[[0-9:]+ INFO\]: ServerLoadEvent' clean.txt || { echo "FAIL: no event was displayed (ServerLoadEvent)"; fail=1; }
+grep -qE '\[[0-9:]+ INFO\]: \[EventFinder\] Event: ServerLoadEvent$' clean.txt || { echo "FAIL: no event was displayed (ServerLoadEvent)"; fail=1; }
 grep -q 'hidden conditions' clean.txt || { echo "FAIL: /event list did not respond"; fail=1; }
 if grep -qE "$errors" clean.txt; then
     echo "FAIL: plugin error or warning in log"
